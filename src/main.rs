@@ -1,3 +1,5 @@
+extern crate ai;
+
 pub struct Agent {
   age: i32,
   total_reward: f64,
@@ -48,6 +50,8 @@ impl CoinFlip {
 //}
 
 fn main() {
+  println!("{}", ai::environment::hello());
+
   let mut agent = Agent::new();
 
   println!("Starting simulation");
