@@ -8,9 +8,9 @@ use ai::random::Random;
 fn main() {
   // TODO(dinowernli): put this behind some kind of flag.
   // test_random();
-
+  let rand = Box::new(Random::new(5767567));
   let mut environment = CoinFlip::new();
-  let mut agent = Agent::new(environment.num_actions());
+  let mut agent = Agent::new(environment.num_actions(), rand);
 
   println!("Starting simulation");
   for cycle in 0..10 {
