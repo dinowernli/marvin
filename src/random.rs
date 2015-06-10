@@ -1,10 +1,15 @@
-pub struct Random {
+pub trait Random {
+  /// Returns a random number in the range [0, limit - 1].
+  fn next_modulo(&mut self, limit: i64) -> i64;
+}
+
+pub struct RandomImpl {
   state: i64,
 }
 
-impl Random {
-  pub fn new(seed: i64) -> Random {
-    Random {
+impl RandomImpl {
+  pub fn new(seed: i64) -> RandomImpl {
+    RandomImpl {
       state: seed,
     }
   }
@@ -15,12 +20,13 @@ impl Random {
     return result;
   }
 
-  pub fn new_child(&mut self) -> Random {
-    return Random::new(self.next());
+  pub fn new_child(&mut self) -> RandomImpl {
+    return RandomImpl::new(self.next());
   }
+}
 
-  /// Returns a random number in the range [0, limit - 1].
-  pub fn next_modulo(&mut self, limit: i64) -> i64 {
+impl Random for RandomImpl {
+  fn next_modulo(&mut self, limit: i64) -> i64 {
     return self.next() % limit;
   }
 }
