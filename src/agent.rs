@@ -1,13 +1,15 @@
 pub struct Agent {
   age: i32,
   total_reward: f64,
+  num_actions: i16,
 }
 
 impl Agent {
-  pub fn new() -> Agent {
+  pub fn new(num_actions: i16) -> Agent {
     Agent {
       age: 0,
       total_reward: 0.0,
+      num_actions: num_actions,
     }
   }
 
@@ -19,8 +21,9 @@ impl Agent {
     self.total_reward
   }
 
+  /// Returns an action in [0, num_actions - 1].
   pub fn act(&mut self) -> i16 {
-    return 4;  // Constant action for now.
+    return 0;  // Constant action for now.
   }
 
   pub fn update(&mut self, observation: i16, reward: f64) {
