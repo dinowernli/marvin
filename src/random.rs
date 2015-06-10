@@ -15,6 +15,10 @@ impl Random {
     return result;
   }
 
+  pub fn new_child(&mut self) -> Random {
+    return Random::new(self.next());
+  }
+
   /// Returns a random number in the range [0, limit - 1].
   pub fn next_modulo(&mut self, limit: i64) -> i64 {
     return self.next() % limit;

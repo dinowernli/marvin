@@ -1,3 +1,5 @@
+use random::Random;
+
 pub trait Environment {
   fn num_actions(&self) -> i16;
   fn reward(&self) -> f64;
@@ -9,16 +11,18 @@ pub trait Environment {
 pub struct CoinFlip {
   last_toss: i16,
   last_guess: i16,
+  random: Box<Random>,
 }
 
 impl CoinFlip {
-  pub fn new() -> CoinFlip {
+  pub fn new(random: Box<Random>) -> CoinFlip {
     CoinFlip {
       last_toss: 0,   // tails
 
       // TODO(dinowernli): Add an enum for guesses for either
       // HEADS, TAILS. or INVALID.
       last_guess: -1,
+      random: random,
     }
   }
 }
@@ -44,10 +48,6 @@ impl Environment for CoinFlip {
     };
 
     // Just alternate heads and tails for now.
-    self.last_toss = match self.last_toss {
-      0 => 1,
-      1 => 0,
-      _ => 0,  // Can't happen.
-    };
+    self.last_toss = self.random.next_modulo(2) as i16;
   }
 }

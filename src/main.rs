@@ -6,12 +6,17 @@ use ai::environment::CoinFlip;
 use ai::random::Random;
 
 fn main() {
-  // TODO(dinowernli): put this behind some kind of flag.
   // test_random();
-  let rand = Box::new(Random::new(5767567));
-  let mut environment = CoinFlip::new();
-  let mut agent = Agent::new(environment.num_actions(), rand);
 
+  // Use one RNG to bootstrap the others so that we only have one magic seed constant.
+  let mut rand1 = Box::new(Random::new(5761567));
+  let mut rand2 = Box::new(rand1.new_child());
+
+  // Setup the agent and the environment.
+  let mut environment = CoinFlip::new(rand1);
+  let mut agent = Agent::new(environment.num_actions(), rand2);
+
+  // Let the agent loose on the environment.
   let n_cycles = 50;
   println!("Starting simulation with {} cycles", n_cycles);
   for cycle in 0..n_cycles {
@@ -28,6 +33,7 @@ fn main() {
     environment.update(action);
   }
   
+  // Report results.
   println!("The average reward after {} rounds is {}", agent.age(), agent.average_reward());
 }
 
