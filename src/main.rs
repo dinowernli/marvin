@@ -12,21 +12,23 @@ fn main() {
   let mut environment = CoinFlip::new();
   let mut agent = Agent::new(environment.num_actions(), rand);
 
-  println!("Starting simulation");
-  for cycle in 0..10 {
+  let n_cycles = 50;
+  println!("Starting simulation with {} cycles", n_cycles);
+  for cycle in 0..n_cycles {
     let observation = environment.observation();
     let reward = environment.reward();
-    println!("Cycle: {}, [observation={}, reward={}]", cycle, observation, reward);
 
     agent.update(observation, reward);
     let action = agent.act();
     assert!(action >= 0 && action < environment.num_actions());
-    println!("Agent took action: {}", action);
+
+    println!("Cycle: {}, [observation={}, reward={}], took action {}", 
+        cycle, observation, reward, action);
 
     environment.update(action);
   }
   
-  println!("Average reward after {} rounds is {}", agent.age(), agent.average_reward());
+  println!("The average reward after {} rounds is {}", agent.age(), agent.average_reward());
 }
 
 /// Benchmarks our random number generator by sampling it and producing a histogram.
