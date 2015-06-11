@@ -1,5 +1,7 @@
 use random::Random;
 
+use std::rc::Rc;
+
 pub trait Environment {
   fn num_actions(&self) -> i16;
   fn reward(&self) -> f64;
@@ -11,11 +13,11 @@ pub trait Environment {
 pub struct CoinFlip {
   last_toss: i16,
   last_guess: i16,
-  random: Box<Random>,
+  random: &mut Random,
 }
 
 impl CoinFlip {
-  pub fn new(random: Box<Random>) -> CoinFlip {
+  pub fn new(random: &mut Random) -> CoinFlip {
     CoinFlip {
       last_toss: 0,   // tails
 

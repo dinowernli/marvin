@@ -5,14 +5,14 @@ use ai::environment::Environment;
 use ai::environment::CoinFlip;
 use ai::random::RandomImpl;
 
+use std::rc::Rc;
+
 fn main() {
-  // Use one RNG to bootstrap the others so that we only have one magic seed constant.
-  let mut rand1 = Box::new(RandomImpl::new(5761567));
-  let rand2 = Box::new(rand1.new_child());
+  let mut rand = Rc::new(RandomImpl::new(5761567));
 
   // Setup the agent and the environment.
-  let mut environment = CoinFlip::new(rand1);
-  let mut agent = Agent::new(environment.num_actions(), rand2);
+  let mut environment = CoinFlip::new(rand);
+  let mut agent = Agent::new(environment.num_actions(), rand);
 
   // Let the agent loose on the environment.
   let n_cycles = 10;
