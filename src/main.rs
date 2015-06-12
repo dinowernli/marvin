@@ -4,7 +4,7 @@ use ai::agent::Agent;
 use ai::environment::Environment;
 use ai::environment::CoinFlip;
 use ai::random::RandomImpl;
-use ai::types::{Action, Observation, Reward};
+use ai::types::Reward;
 
 // Without this, cargo test warns that "main" is unused.
 #[cfg_attr(test, allow(dead_code))]
