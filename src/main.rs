@@ -6,6 +6,8 @@ use ai::environment::CoinFlip;
 use ai::random::RandomImpl;
 use ai::types::{Action, Observation, Reward};
 
+// Without this, cargo test warns that "main" is unused.
+#[cfg_attr(test, allow(dead_code))]
 fn main() {
   // Use one RNG to bootstrap the others so that we only have one magic seed constant.
   let mut rand1 = Box::new(RandomImpl::new(5761567));
