@@ -30,6 +30,10 @@ impl Bitstring {
   /// smallest sequence of bits which can represent the value, i.e.,
   /// log2(ceil(value)).
   pub fn from_u64(value: u64) -> Bitstring {
+    if value == 0 {
+      return Bitstring::new(vec!(Bit::Zero));
+    }
+
     // We compute the bit values by repeatedly getting the least
     // significant bit and then shifting. Since pushing to the end of
     // a vector is more efficient than pushing to the start, we keep
