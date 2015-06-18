@@ -1,5 +1,6 @@
 pub mod agent;
 pub mod bitstring;
+pub mod context_tree;
 pub mod environment;
 pub mod types;
 pub mod random;
@@ -10,3 +11,6 @@ pub mod agent_test;
 
 #[cfg(test)]
 pub mod bitstring_test;
+
+#[cfg(test)]
+pub mod context_tree_test;

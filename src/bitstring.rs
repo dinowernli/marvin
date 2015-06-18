@@ -56,6 +56,6 @@ impl Bitstring {
   }
 
   pub fn bit(&self, i: usize) -> Bit {
-    return self.bits[i].clone();
+    return self.bits[i];
   }
 }
