@@ -23,6 +23,7 @@ impl FakeRandom {
 }
 
 impl Random for FakeRandom {
+  #[allow(unused_variables)]  // Ignores the limit.
   fn next_modulo(&mut self, limit: i64) -> i64 {
     return self.value as i64;
   }
