@@ -1,5 +1,8 @@
 use random::Random;
 
+/// Models a general environment an agent can interact with and
+/// learn from. Know how many actions are availavle and knows
+/// how to process the actions of agent.
 pub trait Environment {
   fn num_actions(&self) -> i16;
   fn reward(&self) -> f64;
@@ -8,12 +11,16 @@ pub trait Environment {
   fn update(&mut self, action: i16);
 }
 
+/// An environment in which the observations represent repeated
+/// tosses of a coin. Actions which guess the outcome of the coin
+/// toss are rewarded.
 pub struct CoinFlip {
   last_toss: CoinToss,
   last_guess: Option<CoinToss>,
   random: Box<Random>,
 }
 
+/// The possible outcomes of a single coin toss.
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum CoinToss {
   Heads,

@@ -1,6 +1,7 @@
 use random::Random;
 use types::Reward;
 
+/// Model struct for an agent which can interact with an environment.
 pub struct Agent {
   age: i32,
   total_reward: Reward,

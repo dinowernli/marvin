@@ -4,6 +4,7 @@ pub enum Bit {
   One,
 }
 
+/// Basic representation of a sequence of bits.
 pub struct Bitstring {
   // TODO(dinowernli): Investigate storing a Vec<u64> instead
   // and doing the conversoin to {Zero, One} upon request.
