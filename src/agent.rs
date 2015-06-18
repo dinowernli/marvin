@@ -23,8 +23,14 @@ impl Agent {
     self.age
   }
 
+  /// Returns the total reward accumulated so far.
   pub fn total_reward(&self) -> Reward {
     self.total_reward
+  }
+
+  /// Returns the average reward accumulated so far.
+  pub fn average_reward(&self) -> Reward {
+    return self.total_reward / (self.age as f64);
   }
 
   /// Returns an action in [0, num_actions - 1].
@@ -33,12 +39,10 @@ impl Agent {
     return self.random.next_modulo(self.num_actions as i64) as i16;
   }
 
+  /// Update the agent's view of the world based on a new
+  /// (observation, reward) pair.
   pub fn update(&mut self, observation: i16, reward: Reward) {
     self.age = self.age + 1;
     self.total_reward = self.total_reward + reward;
-  }
-
-  pub fn average_reward(&self) -> Reward {
-    return self.total_reward / (self.age as f64);
   }
 }
