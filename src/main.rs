@@ -1,4 +1,5 @@
 extern crate ai;
+extern crate rand;
 
 use ai::agent::Agent;
 use ai::environment::Environment;
@@ -6,9 +7,13 @@ use ai::environment::CoinFlip;
 use ai::random::RandomImpl;
 use ai::types::Reward;
 
+use rand::{Rng, SeedableRng, StdRng};
+
 // Without this, cargo test warns that "main" is unused.
 #[cfg_attr(test, allow(dead_code))]
 fn main() {
+  playground();
+
   // Use one RNG to bootstrap the others so that we only have one magic seed constant.
   let mut rand1 = Box::new(RandomImpl::new(5761567));
   let rand2 = Box::new(rand1.new_child());
@@ -35,4 +40,13 @@ fn main() {
   
   // Report results.
   println!("The average reward after {} rounds is {:?}", agent.age(), agent.average_reward());
+}
+
+/// Testbed for experimentation.
+fn playground() {
+  let seed: &[_] = &[1896768];
+  let mut rng: StdRng = SeedableRng::from_seed(seed);
+  for _ in 0..5 {
+    println!("Rng: {}", rng.gen::<u64>() % 17);
+  }
 }
