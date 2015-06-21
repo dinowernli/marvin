@@ -18,8 +18,8 @@ impl ContextTree {
 
 /// One node in the context tree.
 struct Node {
-  left: Option<Box<Node>>,
-  right: Option<Box<Node>>,
+  zero_child: Option<Box<Node>>,
+  one_child: Option<Box<Node>>,
 }
 
 impl Node {
@@ -33,31 +33,31 @@ impl Node {
 
   fn new_leaf() -> Node {
     Node {
-      left: None,
-      right: None,
+      zero_child: None,
+      one_child: None,
     }
   }
 
   fn new_inner(depth: usize, level: usize) -> Node {
     Node {
-      left: Some(Box::new(Node::new(depth, level + 1))),
-      right: Some(Box::new(Node::new(depth, level + 1))),
+      zero_child: Some(Box::new(Node::new(depth, level + 1))),
+      one_child: Some(Box::new(Node::new(depth, level + 1))),
     }
   }
 
   /// Returns the number of nodes in the subtree rooted at this node.
   fn size(&self) -> usize {
     return if self.is_leaf() { 1 } else {
-      let left_size = self.left.as_ref().unwrap().size();
-      let right_size = self.right.as_ref().unwrap().size();
-      left_size + right_size + 1
+      let zero_child_size = self.zero_child.as_ref().unwrap().size();
+      let one_child_size = self.one_child.as_ref().unwrap().size();
+      zero_child_size + one_child_size + 1
     };
   }
 
   fn is_leaf(&self) -> bool {
-    if self.left.is_some() != self.right.is_some() {
+    if self.zero_child.is_some() != self.one_child.is_some() {
       panic!("ContextTree nodes cannot have only one child.");
     }
-    return !self.left.is_some();
+    return !self.zero_child.is_some();
   }
 }
