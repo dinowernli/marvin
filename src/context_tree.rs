@@ -99,7 +99,15 @@ impl Node {
       Bit::Zero => self.zeroes += 1,
       Bit::One => self.ones += 1,
     }
-    // TODO(dinowernli): Update kt probs.
+
+    // Old value + 0.5 is the same as new value - 0.5.
+    let first_summand = match bit {
+      Bit::Zero => self.zeroes as f64 - 0.5,
+      Bit::One => self.ones as f64 - 0.5,
+    }.log2();
+    let norm_summand = ((self.zeroes + self.ones) as f64).log2();
+
+    self.log_kt_prob = first_summand - norm_summand + self.log_kt_prob;
     self.update_weighted_prob();
   }
 
