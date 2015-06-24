@@ -1,7 +1,8 @@
 use random::Random;
 
-use std::rc::Rc;
-
+/// Models a general environment an agent can interact with and
+/// learn from. Know how many actions are availavle and knows
+/// how to process the actions of agent.
 pub trait Environment {
   fn num_actions(&self) -> i16;
   fn reward(&self) -> f64;
@@ -10,20 +11,27 @@ pub trait Environment {
   fn update(&mut self, action: i16);
 }
 
+/// An environment in which the observations represent repeated
+/// tosses of a coin. Actions which guess the outcome of the coin
+/// toss are rewarded.
 pub struct CoinFlip<'a> {
-  last_toss: i16,
-  last_guess: i16,
+  last_toss: CoinToss,
+  last_guess: Option<CoinToss>,
   random: &'a mut Random,
 }
 
-impl <'a> CoinFlip<'a> {
-  pub fn new(random: &mut Random) -> CoinFlip {
-    CoinFlip {
-      last_toss: 0,   // tails
+/// The possible outcomes of a single coin toss.
+#[derive(Copy, Clone, Debug, PartialEq)]
+enum CoinToss {
+  Heads,
+  Tails,
+}
 
-      // TODO(dinowernli): Add an enum for guesses for either
-      // HEADS, TAILS. or INVALID.
-      last_guess: -1,
+impl <'a> CoinFlip<'a> {
+  pub fn new(random: &'a mut Random) -> CoinFlip<'a> {
+    CoinFlip {
+      last_toss: CoinToss::Tails,
+      last_guess: None,
       random: random,
     }
   }
@@ -35,21 +43,28 @@ impl <'a> Environment for CoinFlip<'a> {
   }
 
   fn reward(&self) -> f64 {
-    return if self.last_guess == self.last_toss { 1.0 } else { 0.0 };
+    match self.last_guess  {
+      Some(val) => if val == self.last_toss { 11.0 } else { 10.0 },
+      _ => 0.0,
+    }
   }
 
   fn observation(&self) -> i16 {
-    return self.last_toss;
+    match self.last_toss  {
+      CoinToss::Heads => 0,
+      CoinToss::Tails => 1,
+    }
   }
 
   fn update(&mut self, action: i16) {
     self.last_guess = match action {
-      0 => 0,
-      1 => 1,
-      _ => -1,  // Invalid.
+      0 => Some(CoinToss::Heads),
+      1 => Some(CoinToss::Tails),
+      _ => None,
     };
 
     // Just alternate heads and tails for now.
-    self.last_toss = self.random.next_modulo(2) as i16;
+    let r = self.random.next_modulo(2);
+    self.last_toss = if r == 1 { CoinToss::Heads } else { CoinToss::Tails};
   }
 }
