@@ -6,14 +6,13 @@ use ai::environment::CoinFlip;
 use ai::random::RandomImpl;
 use ai::types::{Action, Observation, Reward};
 
-use std::rc::Rc;
-
 fn main() {
-  let mut rand = Rc::new(RandomImpl::new(5761567));
+  let mut rand = RandomImpl::new(5761567);
+  let mut rand2 = rand.new_child();
 
   // Setup the agent and the environment.
-  let mut environment = CoinFlip::new(rand);
-  let mut agent = Agent::new(environment.num_actions(), rand);
+  let mut environment = CoinFlip::new(&mut rand);
+  let mut agent = Agent::new(environment.num_actions(), &mut rand2);
 
   // Let the agent loose on the environment.
   let n_cycles = 10;

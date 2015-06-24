@@ -1,15 +1,15 @@
 use random::Random;
 use types::Reward;
 
-pub struct Agent {
+pub struct Agent<'a> {
   age: i32,
   total_reward: Reward,
   num_actions: i16,
-  random: Box<Random>,
+  random: &'a mut Random,
 }
 
-impl Agent {
-  pub fn new(num_actions: i16, random: Box<Random>) -> Agent {
+impl <'a> Agent<'a> {
+  pub fn new(num_actions: i16, random: &'a mut Random) -> Agent {
     Agent {
       age: 0,
       total_reward: Reward(0.0),

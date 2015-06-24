@@ -10,13 +10,13 @@ pub trait Environment {
   fn update(&mut self, action: i16);
 }
 
-pub struct CoinFlip {
+pub struct CoinFlip<'a> {
   last_toss: i16,
   last_guess: i16,
-  random: &mut Random,
+  random: &'a mut Random,
 }
 
-impl CoinFlip {
+impl <'a> CoinFlip<'a> {
   pub fn new(random: &mut Random) -> CoinFlip {
     CoinFlip {
       last_toss: 0,   // tails
@@ -29,7 +29,7 @@ impl CoinFlip {
   }
 }
 
-impl Environment for CoinFlip {
+impl <'a> Environment for CoinFlip<'a> {
   fn num_actions(&self) -> i16 {
     return 2;
   }
