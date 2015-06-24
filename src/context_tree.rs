@@ -1,4 +1,5 @@
 use bitstring::Bit;
+use bitstring::Bitstring;
 
 // Open questions:
 // - How to declare some fields final
@@ -14,6 +15,7 @@ use bitstring::Bit;
 /// must be processed in-order.
 pub struct ContextTree {
   root: Node,
+  history: Bitstring,
 }
 
 impl ContextTree {
@@ -23,6 +25,7 @@ impl ContextTree {
   pub fn create(depth: usize) -> ContextTree {
     ContextTree {
       root: Node::create_root(depth, 0),
+      history: Bitstring::empty(),
     }
   }
 
@@ -32,7 +35,7 @@ impl ContextTree {
   }
 
   /// Returns log2 of the estimated probability of the current history.
-  pub fn log_block_prob(&mut self) -> f64 {
+  fn log_block_prob(&mut self) -> f64 {
     return self.root.log_weighted_prob();
   }
 }
