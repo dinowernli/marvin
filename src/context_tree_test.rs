@@ -2,8 +2,8 @@ use context_tree::ContextTree;
 
 #[test]
 fn size() {
-  let tree = ContextTree::create(4);
-  assert_eq!(7, tree.size());  // 2^(n-1) - 1.
+  let tree = ContextTree::create(3);
+  assert_eq!(15, tree.size());  // 2^(n+1) - 1.
 }
 
 #[test]
