@@ -1,14 +1,15 @@
 use random::Random;
+use types::{Action, Observation, Reward};
 
 /// Models a general environment an agent can interact with and
 /// learn from. Know how many actions are availavle and knows
 /// how to process the actions of agent.
 pub trait Environment {
   fn num_actions(&self) -> i16;
-  fn reward(&self) -> f64;
-  fn observation(&self) -> i16;
+  fn reward(&self) -> Reward;
+  fn observation(&self) -> Observation;
 
-  fn update(&mut self, action: i16);
+  fn update(&mut self, action: Action);
 }
 
 /// An environment in which the observations represent repeated
@@ -42,24 +43,27 @@ impl <'a> Environment for CoinFlip<'a> {
     return 2;
   }
 
-  fn reward(&self) -> f64 {
-    match self.last_guess  {
+  fn reward(&self) -> Reward {
+    Reward(match self.last_guess {
       Some(val) => if val == self.last_toss { 11.0 } else { 10.0 },
       _ => 0.0,
-    }
+    })
   }
 
-  fn observation(&self) -> i16 {
+  fn observation(&self) -> Observation {
     match self.last_toss  {
-      CoinToss::Heads => 0,
-      CoinToss::Tails => 1,
+      CoinToss::Heads => Observation(0),
+      CoinToss::Tails => Observation(1),
     }
   }
 
-  fn update(&mut self, action: i16) {
+  fn update(&mut self, action: Action) {
+    let Action(a) = action;
+    assert!(a >= 0 && a < self.num_actions());
+
     self.last_guess = match action {
-      0 => Some(CoinToss::Heads),
-      1 => Some(CoinToss::Tails),
+      Action(0) => Some(CoinToss::Heads),
+      Action(1) => Some(CoinToss::Tails),
       _ => None,
     };
 

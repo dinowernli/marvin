@@ -1,13 +1,13 @@
 use agent::Agent;
 use random::Random;
-use types::Reward;
+use types::{Observation, Reward};
 
 #[test]
 fn age() {
   let mut random = FakeRandom::new();
   let mut agent = Agent::new(10, &mut random);
   assert_eq!(0, agent.age());
-  agent.update(3, Reward(4.0));
+  agent.update(Observation(3), Reward(4.0));
   assert_eq!(1, agent.age());
 }
 

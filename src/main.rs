@@ -4,7 +4,6 @@ use ai::agent::Agent;
 use ai::environment::Environment;
 use ai::environment::CoinFlip;
 use ai::random::RandomImpl;
-use ai::types::Reward;
 
 // Without this, cargo test warns that "main" is unused.
 #[cfg_attr(test, allow(dead_code))]
@@ -23,14 +22,13 @@ fn main() {
   println!("Starting simulation with {} cycles", n_cycles);
   for cycle in 0..n_cycles {
     let action = agent.act();
-    assert!(action >= 0 && action < environment.num_actions());
     environment.update(action);
 
     let observation = environment.observation();
-    let reward = Reward(environment.reward());
+    let reward = environment.reward();
     agent.update(observation, reward);
 
-    println!("Cycle: {}, [action={}, observation={}, {:?}]",
+    println!("Cycle: {}, [{:?}, {:?}, {:?}]",
         cycle, action, observation, reward);
   }
   

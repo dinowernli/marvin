@@ -1,5 +1,5 @@
 use random::Random;
-use types::Reward;
+use types::{Action, Observation, Reward};
 
 /// Model struct for an agent which can interact with an environment.
 pub struct Agent<'a> {
@@ -34,14 +34,14 @@ impl <'a> Agent<'a> {
   }
 
   /// Returns an action in [0, num_actions - 1].
-  pub fn act(&mut self) -> i16 {
+  pub fn act(&mut self) -> Action {
     // Picks a random legal action for now.
-    return self.random.next_modulo(self.num_actions as u64) as i16;
+    return Action(self.random.next_modulo(self.num_actions as u64) as i16);
   }
 
   /// Update the agent's view of the world based on a new
   /// (observation, reward) pair.
-  pub fn update(&mut self, observation: i16, reward: Reward) {
+  pub fn update(&mut self, observation: Observation, reward: Reward) {
     self.age = self.age + 1;
     self.total_reward = self.total_reward + reward;
   }
