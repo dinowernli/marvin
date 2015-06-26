@@ -16,6 +16,7 @@ use bitstring::Bitstring;
 pub struct ContextTree {
   root: Node,
   history: Bitstring,
+  depth: usize,
 }
 
 impl ContextTree {
@@ -25,13 +26,33 @@ impl ContextTree {
   pub fn create(depth: usize) -> ContextTree {
     ContextTree {
       root: Node::create_root(depth, 0),
-      history: Bitstring::empty(),
+      history: Bitstring::new(),
+      depth: depth,
     }
   }
 
   /// Returns the total number of nodes in the tree.
   pub fn size(&self) -> usize {
     self.root.size()
+  }
+
+  pub fn history_size(&self) -> usize {
+    self.history.len()
+  }
+
+  pub fn update(&mut self, bitstring: &Bitstring) {
+    for bit in bitstring.bits() {
+      self.update_bit(*bit);
+    }
+  }
+
+  fn update_bit(&mut self, bit: Bit) {
+    if self.history_size() < self.depth {
+      self.history.append(bit);
+      return;
+    }
+    // TODO(dinowernli): Find current context path and update from leaf
+    // to root.
   }
 
   /// Returns log2 of the estimated probability of the current history.

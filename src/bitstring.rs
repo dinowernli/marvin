@@ -1,3 +1,6 @@
+use std::string::String;
+use std::string::ToString;
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Bit {
   Zero,
@@ -13,25 +16,23 @@ pub struct Bitstring {
 
 /// A type representing a sequence of Bits.
 impl Bitstring {
-  pub fn empty() -> Bitstring {
+  pub fn new() -> Bitstring {
     return Bitstring {
       bits: Vec::new(),
     };
   }
 
-  fn new(bits: Vec<Bit>) -> Bitstring {
-    return Bitstring {
-      bits: bits
-    };
+  pub fn create_empty() -> Bitstring {
+    Bitstring::new()
   }
 
   /// Encodes the supplied value as a Bitstring by taking its binary
   /// representation. The length of the resulting Bitstring is the
   /// smallest sequence of bits which can represent the value, i.e.,
   /// log2(ceil(value)).
-  pub fn from_u64(value: u64) -> Bitstring {
+  pub fn create_from_u64(value: u64) -> Bitstring {
     if value == 0 {
-      return Bitstring::new(vec!(Bit::Zero));
+      return Bitstring::create_from_bits(vec!(Bit::Zero));
     }
 
     // We compute the bit values by repeatedly getting the least
@@ -48,7 +49,13 @@ impl Bitstring {
     }
 
     bits.reverse();
-    return Bitstring::new(bits);
+    return Bitstring::create_from_bits(bits);
+  }
+
+  fn create_from_bits(bits: Vec<Bit>) -> Bitstring {
+    return Bitstring {
+      bits: bits
+    };
   }
 
   pub fn bits(&self) -> &Vec<Bit> {
@@ -61,5 +68,24 @@ impl Bitstring {
 
   pub fn bit(&self, i: usize) -> Bit {
     return self.bits[i];
+  }
+
+  pub fn append(&mut self, bit: Bit) {
+    self.bits.push(bit);
+  }
+}
+
+impl ToString for Bitstring {
+  /// Returns the string representation of the bitstring, i.e., the
+  /// string representation of 5 is '101'.
+  fn to_string(&self) -> String {
+    let mut result = String::new();
+    for bit in self.bits() {
+      result.push(match *bit {
+        Bit::Zero => '0',
+        Bit::One => '1',
+      });
+    }
+    return result;
   }
 }
