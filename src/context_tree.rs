@@ -48,7 +48,7 @@ impl ContextTree {
 
   fn update_bit(&mut self, bit: Bit) {
     if self.history_size() < self.depth {
-      self.history.append(bit);
+      self.history.push(bit);
       return;
     }
     // TODO(dinowernli): Find current context path and update from leaf

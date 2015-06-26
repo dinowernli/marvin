@@ -28,10 +28,10 @@ fn empty() {
 #[test]
 fn append() {
   let mut bits = Bitstring::new();
-  bits.append(Bit::Zero);
-  bits.append(Bit::Zero);
-  bits.append(Bit::One);
-  bits.append(Bit::One);
-  bits.append(Bit::Zero);
+  bits.push(Bit::Zero);
+  bits.push(Bit::Zero);
+  bits.push(Bit::One);
+  bits.push(Bit::One);
+  bits.push(Bit::Zero);
   assert_eq!("00110", bits.to_string());
 }

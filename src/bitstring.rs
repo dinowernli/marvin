@@ -70,7 +70,7 @@ impl Bitstring {
     return self.bits[i];
   }
 
-  pub fn append(&mut self, bit: Bit) {
+  pub fn push(&mut self, bit: Bit) {
     self.bits.push(bit);
   }
 }
