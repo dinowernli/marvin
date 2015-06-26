@@ -59,7 +59,7 @@ impl <'a> Environment for CoinFlip<'a> {
 
   fn update(&mut self, action: Action) {
     let Action(a) = action;
-    assert!(a >= 0 && a < self.num_actions());
+    debug_assert!(a >= 0 && a < self.num_actions());
 
     self.last_guess = match action {
       Action(0) => Some(CoinToss::Heads),
