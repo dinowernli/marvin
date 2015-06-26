@@ -51,7 +51,7 @@ impl <'a> Environment for CoinFlip<'a> {
   }
 
   fn observation(&self) -> Observation {
-    match self.last_toss  {
+    match self.last_toss {
       CoinToss::Heads => Observation(0),
       CoinToss::Tails => Observation(1),
     }
@@ -67,8 +67,10 @@ impl <'a> Environment for CoinFlip<'a> {
       _ => None,
     };
 
-    // Just alternate heads and tails for now.
-    let r = self.random.next_modulo(2);
-    self.last_toss = if r == 1 { CoinToss::Heads } else { CoinToss::Tails};
+    self.last_toss = match self.random.next_modulo(2) {
+      0 => CoinToss::Heads,
+      1 => CoinToss::Tails,
+      _ => panic!(),
+    };
   }
 }
