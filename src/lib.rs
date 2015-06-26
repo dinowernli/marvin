@@ -1,3 +1,5 @@
+extern crate rand;
+
 pub mod agent;
 pub mod bitstring;
 pub mod context_tree;

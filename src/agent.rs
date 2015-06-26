@@ -36,7 +36,7 @@ impl <'a> Agent<'a> {
   /// Returns an action in [0, num_actions - 1].
   pub fn act(&mut self) -> i16 {
     // Picks a random legal action for now.
-    return self.random.next_modulo(self.num_actions as i64) as i16;
+    return self.random.next_modulo(self.num_actions as u64) as i16;
   }
 
   /// Update the agent's view of the world based on a new

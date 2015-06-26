@@ -12,7 +12,7 @@ fn age() {
 }
 
 struct FakeRandom {
-  value: i16,
+  value: u64,
 }
 
 impl FakeRandom {
@@ -25,7 +25,7 @@ impl FakeRandom {
 
 impl Random for FakeRandom {
   #[allow(unused_variables)]  // Ignores the limit.
-  fn next_modulo(&mut self, limit: i64) -> i64 {
-    return self.value as i64;
+  fn next_modulo(&mut self, limit: u64) -> u64 {
+    return self.value;
   }
 }
