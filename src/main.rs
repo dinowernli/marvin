@@ -8,6 +8,9 @@ use ai::random::RandomImpl;
 // TODO(dinowernli): Replace these with command line flags.
 const CONTEXT_TREE_DEPTH: usize = 4;
 
+// TODO(dinowernli): Use the extern crate log rathern than
+// print macros.
+
 // Without this, cargo test warns that "main" is unused.
 #[cfg_attr(test, allow(dead_code))]
 fn main() {
