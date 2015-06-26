@@ -6,6 +6,11 @@ use bitstring::Bitstring;
 // - How to declare some fields mutable (can be changed for non-mut self)
 // - Have the tree implement iter and simplify some methods with "fold".
 
+/// An object capable of predicting observations and rewards based on
+/// experience.
+pub trait Predictor {
+}
+
 /// Context tree which computes a probability estimate for a sequence of
 /// bits based on a mixture model of Markov chains. Lower-degree Markov
 /// chains have higher priors in the mixture model, thus formalizing the
@@ -17,6 +22,9 @@ pub struct ContextTree {
   root: Node,
   history: Bitstring,
   depth: usize,
+}
+
+impl Predictor for ContextTree {
 }
 
 impl ContextTree {

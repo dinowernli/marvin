@@ -5,6 +5,9 @@ use ai::environment::Environment;
 use ai::environment::CoinFlip;
 use ai::random::RandomImpl;
 
+// TODO(dinowernli): Replace these with command line flags.
+const CONTEXT_TREE_DEPTH: usize = 4;
+
 // Without this, cargo test warns that "main" is unused.
 #[cfg_attr(test, allow(dead_code))]
 fn main() {
@@ -15,7 +18,10 @@ fn main() {
 
   // Setup the agent and the environment.
   let mut environment = CoinFlip::new(&mut rand1);
-  let mut agent = Agent::new(environment.num_actions(), &mut rand2);
+  let mut agent = Agent::create_aixi(
+      environment.num_actions(),
+      &mut rand2,
+      CONTEXT_TREE_DEPTH);
 
   // Let the agent interact with the environment.
   let n_cycles = 10;

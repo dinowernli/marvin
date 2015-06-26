@@ -1,3 +1,4 @@
+use context_tree::{ContextTree, Predictor};
 use random::Random;
 use types::{Action, Observation, Reward};
 
@@ -7,15 +8,34 @@ pub struct Agent<'a> {
   total_reward: Reward,
   num_actions: i16,
   random: &'a mut Random,
+
+  /// This agent's model of the environment. Used to predict
+  /// (observation, reward) pairs in order to decide how to act.
+  predictor: Box<Predictor>,
 }
 
 impl <'a> Agent<'a> {
-  pub fn new(num_actions: i16, random: &'a mut Random) -> Self {
+  pub fn create_aixi(
+      num_actions: i16,
+      random: &'a mut Random,
+      context_tree_depth: usize) -> Self {
+    Agent::new(
+        num_actions,
+        random,
+        Box::new(ContextTree::create(context_tree_depth)))
+  }
+
+  /// Visible for testing.
+  pub fn new(
+      num_actions: i16,
+      random: &'a mut Random,
+      predictor: Box<Predictor>) -> Self {
     Agent {
       age: 0,
       total_reward: Reward(0.0),
       num_actions: num_actions,
       random: random,
+      predictor: predictor,
     }
   }
 
