@@ -16,13 +16,13 @@ pub struct Bitstring {
 
 /// A type representing a sequence of Bits.
 impl Bitstring {
-  pub fn new() -> Bitstring {
+  pub fn new() -> Self {
     return Bitstring {
       bits: Vec::new(),
     };
   }
 
-  pub fn create_empty() -> Bitstring {
+  pub fn create_empty() -> Self {
     Bitstring::new()
   }
 
@@ -30,7 +30,7 @@ impl Bitstring {
   /// representation. The length of the resulting Bitstring is the
   /// smallest sequence of bits which can represent the value, i.e.,
   /// log2(ceil(value)).
-  pub fn create_from_u64(value: u64) -> Bitstring {
+  pub fn create_from_u64(value: u64) -> Self {
     if value == 0 {
       return Bitstring::create_from_bits(vec!(Bit::Zero));
     }
@@ -52,7 +52,7 @@ impl Bitstring {
     return Bitstring::create_from_bits(bits);
   }
 
-  fn create_from_bits(bits: Vec<Bit>) -> Bitstring {
+  fn create_from_bits(bits: Vec<Bit>) -> Self {
     return Bitstring {
       bits: bits
     };

@@ -10,7 +10,7 @@ pub struct Agent<'a> {
 }
 
 impl <'a> Agent<'a> {
-  pub fn new(num_actions: i16, random: &'a mut Random) -> Agent {
+  pub fn new(num_actions: i16, random: &'a mut Random) -> Self {
     Agent {
       age: 0,
       total_reward: Reward(0.0),

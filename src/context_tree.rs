@@ -23,7 +23,7 @@ impl ContextTree {
   /// The depth of the tree is the distance between leaves and the root.
   /// For a given depth d, the tree will compute a mixture model of all
   /// Markov chains of degree at most d.
-  pub fn create(depth: usize) -> ContextTree {
+  pub fn create(depth: usize) -> Self {
     ContextTree {
       root: Node::create_root(depth, 0),
       history: Bitstring::new(),
@@ -88,7 +88,7 @@ struct Node {
 impl Node {
   /// Creates a node and all its children recursively until the provided
   /// depth is reached.
-  pub fn create_root(target_depth: usize, current_depth: usize) -> Node {
+  pub fn create_root(target_depth: usize, current_depth: usize) -> Self {
     if target_depth == current_depth {
       return Node::new(None, None);  // Leaf.
     } else {
@@ -98,7 +98,7 @@ impl Node {
     }
   }
 
-  fn new(zero_child: Option<Box<Node>>, one_child: Option<Box<Node>>) -> Node {
+  fn new(zero_child: Option<Box<Node>>, one_child: Option<Box<Node>>) -> Self {
     // Context trees are complete trees (either both children or no children).
     assert!(zero_child.is_none() == one_child.is_none());
 

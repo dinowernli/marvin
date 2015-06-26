@@ -12,7 +12,7 @@ pub struct RandomImpl {
 }
 
 impl RandomImpl {
-  pub fn create(seed: usize) -> RandomImpl {
+  pub fn create(seed: usize) -> Self {
     let seed_slice: &[_] = &[seed as usize];
     return RandomImpl {
       //generator: SeedableRng::from_seed(seed_slice),
@@ -27,7 +27,7 @@ impl RandomImpl {
 
   /// Returns a new random number generator seeded with the
   /// next random number produced by this generator.
-  pub fn new_child(&mut self) -> RandomImpl {
+  pub fn new_child(&mut self) -> Self {
     return RandomImpl::create(self.next() as usize);
   }
 }

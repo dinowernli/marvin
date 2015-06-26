@@ -28,7 +28,7 @@ enum CoinToss {
 }
 
 impl <'a> CoinFlip<'a> {
-  pub fn new(random: &'a mut Random) -> CoinFlip<'a> {
+  pub fn new(random: &'a mut Random) -> Self<'a> {
     CoinFlip {
       last_toss: CoinToss::Tails,
       last_guess: None,
