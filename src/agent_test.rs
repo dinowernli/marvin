@@ -1,4 +1,5 @@
 use agent::Agent;
+use bitstring::Bitstring;
 use context_tree::Predictor;
 use random::Random;
 use types::{Observation, Reward};
@@ -27,6 +28,15 @@ impl FakePredictor {
 }
 
 impl Predictor for FakePredictor {
+  fn history_size(&self) -> usize { 17 }
+
+  fn revert_to_history_size(&mut self, target_size: usize) {
+    // Do nothing.
+  }
+
+  fn update(&mut self, bitstring: &Bitstring) {
+    // Do nothing.
+  }
 }
 
 

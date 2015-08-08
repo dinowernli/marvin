@@ -7,8 +7,18 @@ use bitstring::Bitstring;
 // - Have the tree implement iter and simplify some methods with "fold".
 
 /// An object capable of predicting observations and rewards based on
-/// experience.
+/// experience. Predictors have an abstract notion of history which
+/// grows over time and represents the experience.
 pub trait Predictor {
+  /// Returns the size of the currently tracked history.
+  fn history_size(&self) -> usize;
+
+  /// Appends the provided bit string to the tracked history.
+  fn update(&mut self, bitstring: &Bitstring);
+
+  /// Reverts the context tree to a previous state by undoing update
+  /// operations. The specified size must be at most the current size.
+  fn revert_to_history_size(&mut self, target_size: usize);
 }
 
 /// Context tree which computes a probability estimate for a sequence of
@@ -25,6 +35,22 @@ pub struct ContextTree {
 }
 
 impl Predictor for ContextTree {
+  fn history_size(&self) -> usize {
+    self.history.len()
+  }
+
+  fn revert_to_history_size(&mut self, target_size: usize) {
+    assert!(target_size <= self.history_size());
+    while target_size > self.history_size() {
+      self.revert_last();
+    }
+  }
+
+  fn update(&mut self, bitstring: &Bitstring) {
+    for bit in bitstring.bits() {
+      self.update_bit(*bit);
+    }
+  }
 }
 
 impl ContextTree {
@@ -44,16 +70,6 @@ impl ContextTree {
     self.root.size()
   }
 
-  pub fn history_size(&self) -> usize {
-    self.history.len()
-  }
-
-  pub fn update(&mut self, bitstring: &Bitstring) {
-    for bit in bitstring.bits() {
-      self.update_bit(*bit);
-    }
-  }
-
   fn update_bit(&mut self, bit: Bit) {
     if self.history_size() < self.depth {
       self.history.push(bit);
@@ -61,6 +77,11 @@ impl ContextTree {
     }
     // TODO(dinowernli): Find current context path and update from leaf
     // to root.
+  }
+
+  fn revert_last(&mut self) {
+    let bit = self.history.pop();
+    self.root.revert(bit);
   }
 
   /// Returns log2 of the estimated probability of the current history.

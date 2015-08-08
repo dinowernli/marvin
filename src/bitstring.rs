@@ -73,6 +73,11 @@ impl Bitstring {
   pub fn push(&mut self, bit: Bit) {
     self.bits.push(bit);
   }
+
+  /// Only valid if this bit string is not empty.
+  pub fn pop(&mut self) -> Bit {
+    return self.bits.pop().unwrap();
+  }
 }
 
 impl ToString for Bitstring {
