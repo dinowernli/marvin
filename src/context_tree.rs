@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use std::f64;
+
 use bitstring::Bit;
 use bitstring::Bitstring;
 
@@ -202,6 +204,7 @@ impl Node {
   fn update_weighted_prob(&mut self) {
     if self.is_leaf() {
       self.log_weighted_prob = self.log_kt_prob;
+      return;
     }
 
     let log_weighted_probs =
@@ -213,9 +216,8 @@ impl Node {
     // The recursive term should be log2(1 + 2^exponent). If the exponent is
     // large enough, 2^exponent is inf. In this case, we approximate
     // log2(1 + 2^exponent) by log2(2^exponent) = exponent.
-    let inf = 1.0f64 / 0.0f64;
     let recursive_term =
-        if power == inf { exponent } else { (power + 1.0).log2() };
+        if power == f64::INFINITY { exponent } else { (power + 1.0).log2() };
 
     self.log_weighted_prob = self.log_kt_prob + recursive_term - 1.0;
   }
