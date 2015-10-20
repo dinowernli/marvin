@@ -44,9 +44,9 @@ impl StdoutLogger {
 impl log::Log for StdoutLogger {
   fn enabled(&self, metadata: &LogMetadata) -> bool {
     metadata.level() <= self.max_enabled_level
-  } 
+  }
 
   fn log(&self, record: &LogRecord) {
-    println!("{} - {}", record.level(), record.args());
+    println!("{}:{} - {}", record.level(), record.target(), record.args());
   }
 }
