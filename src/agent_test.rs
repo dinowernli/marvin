@@ -53,10 +53,12 @@ impl Predictor for FakePredictor {
   fn history_size(&self) -> usize { 17 }
 
   fn revert_to_history_size(&mut self, target_size: usize) {
+    #![allow(unused_variables)]
     // Do nothing.
   }
 
   fn update(&mut self, bitstring: &Bitstring) {
+    #![allow(unused_variables)]
     // Do nothing.
   }
 }
