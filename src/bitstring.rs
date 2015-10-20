@@ -80,17 +80,9 @@ impl Bitstring {
     };
   }
 
-  pub fn bits(&self) -> &Vec<Bit> {
-    return &self.bits;
-  }
-
-  pub fn len(&self) -> usize {
-    return self.bits().len();
-  }
-
-  pub fn bit(&self, i: usize) -> Bit {
-    return self.bits[i];
-  }
+  pub fn bits(&self) -> &Vec<Bit> { &self.bits }
+  pub fn len(&self) -> usize { self.bits().len() }
+  pub fn bit(&self, i: usize) -> Bit { self.bits[i] }
 
   pub fn push(&mut self, bit: Bit) {
     self.bits.push(bit);
