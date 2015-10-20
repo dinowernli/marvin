@@ -201,16 +201,10 @@ impl Node {
   /// Updates the state of the node based on the value of the new bit.
   /// Assumes that child nodes (if any) have already been updated.
   pub fn update(&mut self, bit: Bit) {
-    match bit {
-      Bit::Zero => self.zeroes += 1,
-      Bit::One => self.ones += 1,
-    }
+    *self.mut_frequency(bit) += 1;
 
     // Old value + 0.5 is the same as new value - 0.5.
-    let first_summand = match bit {
-      Bit::Zero => self.zeroes as f64 - 0.5,
-      Bit::One => self.ones as f64 - 0.5,
-    }.log2();
+    let first_summand = (*self.mut_frequency(bit) as f64 - 0.5).log2();
     let norm_summand = ((self.zeroes + self.ones) as f64).log2();
 
     self.log_kt_prob = first_summand - norm_summand + self.log_kt_prob;
@@ -220,10 +214,7 @@ impl Node {
   /// Corresponds to undoing one update for the specified bit value.
   /// Assumes that child nodes (if any) have already been reverted.
   pub fn revert(&mut self, bit: Bit) {
-    match bit {
-      Bit::Zero => self.zeroes -= 1,
-      Bit::One => self.ones -= 1,
-    }
+    *self.mut_frequency(bit) -= 1;
     // TODO(dinowernli): Update kt probs.
     self.update_weighted_prob();
   }
@@ -235,6 +226,14 @@ impl Node {
     match bit {
       Bit::Zero => self.zero_child.as_mut().unwrap(),
       Bit::One => self.one_child.as_mut().unwrap(),
+    }
+  }
+
+  /// Returns the frequency corresponding to the supplied bit.
+  fn mut_frequency(&mut self, bit: Bit) -> &mut u64 {
+    match bit {
+      Bit::Zero => &mut self.zeroes,
+      Bit::One => &mut self.ones,
     }
   }
 
