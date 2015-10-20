@@ -20,24 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extern crate rand;
+/// A logging framework for this application. Right now it just logs to stdout,
+/// but it should eventually support logging AI progress to a file.
+
 extern crate log;
 
-pub mod agent;
-pub mod bitstring;
-pub mod context_tree;
-pub mod environment;
-pub mod logger;
-pub mod types;
-pub mod random;
+use log::{LogLevel, LogMetadata, LogRecord};
 
-// Unit test modules.
-#[cfg(test)]
-pub mod agent_test;
+/// A logger which just logs everything to stdout.
+pub struct StdoutLogger {
+  /// The highest log level for which we want log calls to take effect.
+  max_enabled_level: LogLevel,
+}
 
-#[cfg(test)]
-pub mod bitstring_test;
+impl StdoutLogger {
+  pub fn new(max_enabled_level: LogLevel) -> StdoutLogger {
+    StdoutLogger {
+      max_enabled_level: max_enabled_level
+    }
+  }
+}
 
-#[cfg(test)]
-pub mod context_tree_test;
+impl log::Log for StdoutLogger {
+  fn enabled(&self, metadata: &LogMetadata) -> bool {
+    metadata.level() <= self.max_enabled_level
+  } 
 
+  fn log(&self, record: &LogRecord) {
+    println!("{} - {}", record.level(), record.args());
+  }
+}

@@ -22,20 +22,26 @@
 
 extern crate ai;
 
+#[macro_use]
+extern crate log;
+
 use ai::agent::Agent;
 use ai::environment::Environment;
 use ai::environment::CoinFlip;
+use ai::logger::StdoutLogger;
 use ai::random::RandomImpl;
+
+use log::LogLevelFilter;
 
 // TODO(dinowernli): Replace these with command line flags.
 const CONTEXT_TREE_DEPTH: usize = 4;
-
-// TODO(dinowernli): Use the extern crate log rathern than
-// print macros.
+const MAX_LOG_LEVEL: LogLevelFilter = LogLevelFilter::Info;
 
 // Without this, cargo test warns that "main" is unused.
 #[cfg_attr(test, allow(dead_code))]
 fn main() {
+  setup_logger();
+
   // Use one RNG to bootstrap the others so that we only have one
   // magic seed constant.
   let mut rand1 = RandomImpl::create(5761567);
@@ -50,7 +56,7 @@ fn main() {
 
   // Let the agent interact with the environment.
   let n_cycles = 10;
-  println!("Starting simulation with {} cycles", n_cycles);
+  info!("Starting simulation with {} cycles", n_cycles);
   for cycle in 0..n_cycles {
     let action = agent.act();
     environment.update(action);
@@ -59,11 +65,21 @@ fn main() {
     let reward = environment.reward();
     agent.update(observation, reward);
 
-    println!("Cycle: {}, [{:?}, {:?}, {:?}]",
+    info!("Cycle: {}, [{:?}, {:?}, {:?}]",
         cycle, action, observation, reward);
   }
   
   // Report results.
-  println!("The average reward after {} rounds is {:?}", 
+  info!("The average reward after {} rounds is {:?}",
       agent.age(), agent.average_reward());
+}
+
+// Installs a logger which handles all log macro invocations or panics.
+fn setup_logger() {
+  log::set_logger(|max_log_level| {
+    // We're ignoring everything above the max level inside the logger anyway,
+    // so here we tell the logging macros that the call can be skipped.
+    max_log_level.set(MAX_LOG_LEVEL);
+    Box::new(StdoutLogger::new(MAX_LOG_LEVEL.to_log_level().unwrap()))
+  }).unwrap();
 }

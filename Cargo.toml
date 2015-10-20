@@ -27,4 +27,5 @@ authors = ["Dino Wernli <dinowernli@gmail.com>"]
 license = "MIT"
 
 [dependencies]
+log = "*"
 rand = "0.3.11"
