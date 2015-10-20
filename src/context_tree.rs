@@ -94,23 +94,38 @@ impl ContextTree {
     self.root.size()
   }
 
+  /// Adds a single bit to the history seen by this tree, updating all the
+  /// involved nodes if necessary.
   fn update_bit(&mut self, bit: Bit) {
-    if self.history_size() < self.depth {
-      self.history.push(bit);
-      return;
-    }
-    // TODO(dinowernli): Find current context path and update from leaf
-    // to root.
+    self.for_node_in_context(&|node: &mut Node| {
+      node.update(bit);
+    });
+    self.history.push(bit);
   }
 
+  /// Removes a single bit from the history seen by this tree, updating all the
+  /// involved nodes if necessary.
   fn revert_last(&mut self) {
     let bit = self.history.pop();
-    self.root.revert(bit);
+    self.for_node_in_context(&|node: &mut Node| {
+      node.revert(bit);
+    });
   }
 
   /// Returns log2 of the estimated probability of the current history.
   fn log_block_prob(&mut self) -> f64 {
     return self.root.log_weighted_prob();
+  }
+
+  /// Executes the provided closure on the current context, i.e., follows the
+  /// current history down to a leaf and executes the closure on every node
+  /// from the leaf to the root. Does nothing if the current history is not
+  /// long enough to reach a leaf.
+  fn for_node_in_context<F: Fn(&mut Node)>(&mut self, closure: &F) {
+    if self.history_size() < self.depth {
+      return;
+    }
+    self.root.execute(closure, &self.history, 0);
   }
 }
 
@@ -169,6 +184,20 @@ impl Node {
     self.log_weighted_prob
   }
 
+  /// Executes the given closure on the appropriate child (if any) and then on
+  /// itself.
+  pub fn execute<F: Fn(&mut Node)>(
+      &mut self,
+      closure: &F,
+      history: &Bitstring,
+      depth: usize) {
+    if !self.is_leaf() {
+      let bit = history.bit(history.len() - depth);
+      self.mut_child(bit).execute(closure, history, depth + 1);
+    }
+    closure(self);
+  }
+
   /// Updates the state of the node based on the value of the new bit.
   /// Assumes that child nodes (if any) have already been updated.
   pub fn update(&mut self, bit: Bit) {
@@ -197,6 +226,16 @@ impl Node {
     }
     // TODO(dinowernli): Update kt probs.
     self.update_weighted_prob();
+  }
+
+  /// Returns the child corresponding to the supplied bit. Must not be called
+  /// on leaf nodes.
+  fn mut_child(&mut self, bit: Bit) -> &mut Node {
+    assert!(!self.is_leaf());
+    match bit {
+      Bit::Zero => self.zero_child.as_mut().unwrap(),
+      Bit::One => self.one_child.as_mut().unwrap(),
+    }
   }
 
   /// Updates the value of log_weighted_prob. Assumes that log_kt_prob
