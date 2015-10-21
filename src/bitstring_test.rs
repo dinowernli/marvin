@@ -57,3 +57,9 @@ fn append() {
   bits.push(Bit::Zero);
   assert_eq!("00110", bits.to_string());
 }
+
+#[test]
+fn from_string() {
+  let bits = Bitstring::create_from_string("01001");
+  assert_eq!("01001", bits.to_string());
+}

@@ -74,6 +74,20 @@ impl Bitstring {
     return Bitstring::create_from_bits(bits);
   }
 
+  /// Returns a bitstring created from a sequence of characters, each of which
+  /// must be either '0' or '1'. Panics if a bad string is passed.
+  pub fn create_from_string(value: &str) -> Self {
+    let mut bits = Vec::new();
+    for b in value.chars() {
+      bits.push(match b {
+        '0' => Bit::Zero,
+        '1' => Bit::One,
+        _ => panic!("Could not extract bitstring from {}", value),
+      });
+    }
+    return Bitstring::create_from_bits(bits);
+  }
+
   fn create_from_bits(bits: Vec<Bit>) -> Self {
     return Bitstring {
       bits: bits
