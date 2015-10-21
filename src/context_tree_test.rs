@@ -23,6 +23,8 @@
 use context_tree::ContextTree;
 use context_tree::Predictor;
 
+const EPS: f64 = 0.0000001;
+
 #[test]
 fn size() {
   let tree = ContextTree::create(3);
@@ -30,9 +32,16 @@ fn size() {
 }
 
 #[test]
-fn empty() {
+fn empty_size() {
   let tree = ContextTree::create(0);
   assert_eq!(1, tree.size());
+}
+
+#[test]
+fn empty_probability() {
+  let mut tree = ContextTree::create(0);
+  let block_prob = tree.log_block_prob().exp2();
+  assert_almost_eq(1.0, block_prob, EPS);
 }
 
 #[test]
@@ -43,4 +52,10 @@ fn invalid_revert() {
 
   // Attempt to revert to something greater than the history size.
   tree.revert_to_history_size(17);
+}
+
+fn assert_almost_eq(expected: f64, actual: f64, tol: f64) {
+  let diff = expected - actual;
+  assert!(diff < tol, "diff = {}, but expected less than {}", diff, tol);
+  assert!(diff > -tol, "diff = {}, but expected at least {}", diff, tol);
 }

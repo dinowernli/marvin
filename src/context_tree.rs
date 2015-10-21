@@ -113,7 +113,9 @@ impl ContextTree {
   }
 
   /// Returns log2 of the estimated probability of the current history.
-  fn log_block_prob(&mut self) -> f64 {
+  /// TODO(dinowernli): Make this private again once this functionality is
+  /// exposed via actual prediction.
+  pub fn log_block_prob(&mut self) -> f64 {
     return self.root.log_weighted_prob();
   }
 
