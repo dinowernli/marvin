@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use bitstring::Bitstring;
 use context_tree::ContextTree;
 use context_tree::Predictor;
 
@@ -42,6 +43,16 @@ fn empty_probability() {
   let mut tree = ContextTree::create(0);
   let block_prob = tree.log_block_prob().exp2();
   assert_almost_eq(1.0, block_prob, EPS);
+}
+
+#[test]
+fn predict_uniform() {
+  let mut tree = ContextTree::create(3);
+  let prob = tree.predict(&Bitstring::create_from_u64(2));
+
+  // The bitstring corresponds to "10", so length two. Since there is not
+  // enough history for depth 3, predict should be uniform.
+  assert_almost_eq(0.25, prob, EPS);
 }
 
 #[test]

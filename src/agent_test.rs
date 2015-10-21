@@ -57,9 +57,14 @@ impl Predictor for FakePredictor {
     // Do nothing.
   }
 
-  fn update(&mut self, bitstring: &Bitstring) {
+  fn update(&mut self, bits: &Bitstring) {
     #![allow(unused_variables)]
     // Do nothing.
+  }
+
+  fn predict(&mut self, bits: &Bitstring) -> f64 {
+    let neg_len = -(bits.len() as i64);
+    return (neg_len as f64).exp2();
   }
 }
 

@@ -43,6 +43,10 @@ pub trait Predictor {
   /// Reverts the context tree to a previous state by undoing update
   /// operations. The specified size must be at most the current size.
   fn revert_to_history_size(&mut self, target_size: usize);
+
+  /// Returns the probability, given the current history, that "bits" is the
+  /// next symbol.
+  fn predict(&mut self, bits: &Bitstring) -> f64;
 }
 
 /// Context tree which computes a probability estimate for a sequence of
@@ -74,6 +78,17 @@ impl Predictor for ContextTree {
     for bit in bitstring.bits() {
       self.update_bit(*bit);
     }
+  }
+
+  fn predict(&mut self, bits: &Bitstring) -> f64 {
+    // If we don't have enough history, assume a uniform distribution.
+    if !self.has_context() {
+      let neg_len = -(bits.len() as i64);
+      return (neg_len as f64).exp2();
+    }
+
+    // TODO(dinowernli): Implement the rest.
+    return 0.0;
   }
 }
 
@@ -124,11 +139,15 @@ impl ContextTree {
   /// from the leaf to the root. Does nothing if the current history is not
   /// long enough to reach a leaf.
   fn for_node_in_context<F: Fn(&mut Node)>(&mut self, closure: &F) {
-    if self.history_size() < self.depth {
+    if !self.has_context() {
       return;
     }
     self.root.execute(closure, &self.history, 0);
   }
+
+  /// Inidicates whether this tree "has context", i.e., whether or not the
+  /// history is long enough to be able to follow a path down to a leaf.
+  fn has_context(&self) -> bool { self.history_size() >= self.depth }
 }
 
 /// One node in the context tree. Maintains a count of the number
