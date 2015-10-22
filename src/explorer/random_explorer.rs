@@ -20,20 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extern crate rand;
-#[macro_use] extern crate log;
+use explorer::Explorer;
+use random::Random;
+use types::Action;
 
-pub mod agent;
-pub mod bitstring;
-pub mod environment;
-pub mod explorer;
-pub mod logger;
-pub mod predictor;
-pub mod random;
-pub mod types;
+pub struct RandomExplorer {
+  random: Box<Random>
+}
 
-// Unit test modules.
+impl RandomExplorer {
+  pub fn new(random: Box<Random>) -> RandomExplorer {
+    RandomExplorer {
+      random: random,
+    }
+  }
+}
 
-#[cfg(test)] pub mod agent_test;
-#[cfg(test)] pub mod bitstring_test;
-
+impl Explorer for RandomExplorer {
+  fn explore(&mut self, num_actions: i16) -> Action {
+    Action(self.random.next_modulo(num_actions as u64) as i16)
+  }
+}

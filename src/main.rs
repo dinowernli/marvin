@@ -42,14 +42,12 @@ fn main() {
 
   // Use one RNG to bootstrap the others so that we only have one
   // magic seed constant.
-  let mut rand1 = RandomImpl::create(5761567);
-  let mut rand2 = rand1.new_child();
+  let mut rand = RandomImpl::create(5761567);
 
   // Setup the agent and the environment.
-  let mut environment = CoinFlip::new(&mut rand1);
+  let mut environment = CoinFlip::new(&mut rand);
   let mut agent = Agent::create_aixi(
       environment.num_actions(),
-      &mut rand2,
       CONTEXT_TREE_DEPTH);
 
   // Let the agent interact with the environment.

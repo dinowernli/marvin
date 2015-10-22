@@ -20,20 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extern crate rand;
-#[macro_use] extern crate log;
+mod explorer;
+pub use explorer::explorer::Explorer;
 
-pub mod agent;
-pub mod bitstring;
-pub mod environment;
-pub mod explorer;
-pub mod logger;
-pub mod predictor;
-pub mod random;
-pub mod types;
+mod explorer_factory;
+pub use explorer::explorer_factory::ExplorerFactory;
+pub use explorer::explorer_factory::ExplorerFactoryImpl;
 
-// Unit test modules.
-
-#[cfg(test)] pub mod agent_test;
-#[cfg(test)] pub mod bitstring_test;
+mod monte_carlo_explorer;
+mod random_explorer;
 

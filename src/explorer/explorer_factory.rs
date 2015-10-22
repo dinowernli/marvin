@@ -20,70 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use agent::Agent;
-use bitstring::Bitstring;
-use explorer::{Explorer, ExplorerFactory};
+use explorer::Explorer;
+use explorer::monte_carlo_explorer::MonteCarloExplorer;
+use explorer::random_explorer::RandomExplorer;
 use predictor::Predictor;
-use types::{Action, Observation, Reward};
+use random::RandomImpl;
 
-#[test]
-fn age() {
-  let fake_predictor = Box::new(FakePredictor);
-  let fake_explorer_factory = Box::new(FakeExplorerFactory);
-  let mut agent = Agent::new(10, fake_predictor, fake_explorer_factory);
-
-  assert_eq!(0, agent.age());
-  agent.update(Observation(3), Reward(4.0));
-  assert_eq!(1, agent.age());
+/// An object which knows how to produce explorers.
+pub trait ExplorerFactory {
+  fn create_monte_carlo_explorer(
+      &self, predictor: &mut Predictor) -> Box<Explorer>;
+  fn create_random_explorer(
+      &self) -> Box<Explorer>;
 }
 
+pub struct ExplorerFactoryImpl;
 
-// Fake predictor.
-
-struct FakePredictor;
-
-impl Predictor for FakePredictor {
-  fn history_size(&self) -> usize { 17 }
-
-  fn revert_to_history_size(&mut self, target_size: usize) {
-    #![allow(unused_variables)]
-    // Do nothing.
-  }
-
-  fn update(&mut self, bits: &Bitstring) {
-    #![allow(unused_variables)]
-    // Do nothing.
-  }
-
-  fn predict(&mut self, bits: &Bitstring) -> f64 {
-    let neg_len = -(bits.len() as i64);
-    return (neg_len as f64).exp2();
-  }
+impl ExplorerFactoryImpl {
+  pub fn new() -> ExplorerFactoryImpl { ExplorerFactoryImpl }
 }
 
-
-// Fake explorer, including factory.
-
-struct FakeExplorerFactory;
-
-impl ExplorerFactory for FakeExplorerFactory {
+impl ExplorerFactory for ExplorerFactoryImpl {
   fn create_monte_carlo_explorer(
       &self, predictor: &mut Predictor) -> Box<Explorer> {
-    #![allow(unused_variables)]
-    Box::new(FakeExplorer)
+    Box::new(MonteCarloExplorer::new())
   }
 
   fn create_random_explorer(&self) -> Box<Explorer> {
-    Box::new(FakeExplorer)
+    Box::new(RandomExplorer::new(Box::new(RandomImpl::create(235669))))
   }
 }
-
-struct FakeExplorer;
-
-impl Explorer for FakeExplorer {
-  fn explore(&mut self, num_actions: i16) -> Action {
-    #![allow(unused_variables)]
-    Action(0)
-  }
-}
-

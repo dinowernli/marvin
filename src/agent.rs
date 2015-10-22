@@ -20,45 +20,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use explorer::{ExplorerFactory, ExplorerFactoryImpl};
 use predictor::context_tree::ContextTree;
 use predictor::Predictor;
-use random::Random;
 use types::{Action, Observation, Reward};
 
 /// Model struct for an agent which can interact with an environment.
-pub struct Agent<'a> {
+pub struct Agent {
   age: i32,
   total_reward: Reward,
   num_actions: i16,
-  random: &'a mut Random,
 
   /// This agent's model of the environment. Used to predict
   /// (observation, reward) pairs in order to decide how to act.
   predictor: Box<Predictor>,
+
+  /// A factory used to create an explorer whenever this agents needs to
+  /// decide what its next action will be.
+  explorer_factory: Box<ExplorerFactory>,
 }
 
-impl <'a> Agent<'a> {
+impl Agent {
   pub fn create_aixi(
       num_actions: i16,
-      random: &'a mut Random,
       context_tree_depth: usize) -> Self {
     Agent::new(
         num_actions,
-        random,
-        Box::new(ContextTree::create(context_tree_depth)))
+        Box::new(ContextTree::create(context_tree_depth)),
+        Box::new(ExplorerFactoryImpl::new()))
   }
 
   /// Visible for testing.
   pub fn new(
       num_actions: i16,
-      random: &'a mut Random,
-      predictor: Box<Predictor>) -> Self {
+      predictor: Box<Predictor>,
+      explorer_factory: Box<ExplorerFactory>) -> Self {
     Agent {
       age: 0,
       total_reward: Reward(0.0),
       num_actions: num_actions,
-      random: random,
       predictor: predictor,
+      explorer_factory: explorer_factory,
     }
   }
 
@@ -78,8 +80,10 @@ impl <'a> Agent<'a> {
 
   /// Returns an action in [0, num_actions - 1].
   pub fn act(&mut self) -> Action {
-    // Picks a random legal action for now.
-    return Action(self.random.next_modulo(self.num_actions as u64) as i16);
+    let mc_explorer = self.explorer_factory.create_monte_carlo_explorer(
+        &mut *self.predictor);
+    let mut random_explorer = self.explorer_factory.create_random_explorer();
+    return random_explorer.explore(self.num_actions);
   }
 
   /// Update the agent's view of the world based on a new

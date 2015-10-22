@@ -20,20 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extern crate rand;
-#[macro_use] extern crate log;
+use explorer::Explorer;
+use types::Action;
 
-pub mod agent;
-pub mod bitstring;
-pub mod environment;
-pub mod explorer;
-pub mod logger;
-pub mod predictor;
-pub mod random;
-pub mod types;
+pub struct MonteCarloExplorer;
 
-// Unit test modules.
+impl MonteCarloExplorer {
+  pub fn new() -> MonteCarloExplorer { MonteCarloExplorer }
+}
 
-#[cfg(test)] pub mod agent_test;
-#[cfg(test)] pub mod bitstring_test;
-
+impl Explorer for MonteCarloExplorer {
+  fn explore(&mut self, num_actions: i16) -> Action {
+    // TODO(dinowernli): Return an actual reasonable action.
+    return Action(0);
+  }
+}

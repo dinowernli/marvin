@@ -20,20 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extern crate rand;
-#[macro_use] extern crate log;
+use types::Action;
 
-pub mod agent;
-pub mod bitstring;
-pub mod environment;
-pub mod explorer;
-pub mod logger;
-pub mod predictor;
-pub mod random;
-pub mod types;
-
-// Unit test modules.
-
-#[cfg(test)] pub mod agent_test;
-#[cfg(test)] pub mod bitstring_test;
-
+/// An object which knows how to explore the space of possible actions and pick
+/// the most appropriate one.
+pub trait Explorer {
+  /// Returns an action within [0, num_actions - 1].
+  fn explore(&mut self, num_actions: i16) -> Action;
+}
