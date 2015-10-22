@@ -44,8 +44,8 @@ pub trait Predictor {
   /// operations. The specified size must be at most the current size.
   fn revert_to_history_size(&mut self, target_size: usize);
 
-  /// Returns the probability, given the current history, that "bits" is the
-  /// next symbol.
+  /// Returns the probability, given the current history, that "bits" are the
+  /// next observed symbols.
   fn predict(&mut self, bits: &Bitstring) -> f64;
 }
 
