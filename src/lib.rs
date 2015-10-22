@@ -33,9 +33,6 @@ pub mod types;
 
 // Unit test modules.
 
-#[cfg(test)]
-pub mod agent_test;
-
-#[cfg(test)]
-pub mod bitstring_test;
+#[cfg(test)] pub mod agent_test;
+#[cfg(test)] pub mod bitstring_test;
 
