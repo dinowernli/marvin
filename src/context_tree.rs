@@ -246,7 +246,11 @@ impl Node {
   /// Assumes that child nodes (if any) have already been reverted.
   pub fn revert(&mut self, bit: Bit) {
     *self.mut_frequency(bit) -= 1;
-    // TODO(dinowernli): Update kt probs.
+
+    let first_summand = (*self.mut_frequency(bit) as f64 + 0.5).log2();
+    let norm_summand = ((self.zeroes + self.ones + 1) as f64).log2();
+
+    self.log_kt_prob = self.log_kt_prob - first_summand + norm_summand;
     self.update_weighted_prob();
   }
 

@@ -76,8 +76,7 @@ fn revert_restores_size() {
   assert_eq!(5, tree.history_size());
 }
 
-// #[test]
-// TODO(dinowernli): Enable once reverting is finalized.
+#[test]
 fn revert_restores_state() {
   // Setup a tree with some arbitrary history which is long enough.
   let mut tree = ContextTree::create(7);
