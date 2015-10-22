@@ -24,30 +24,12 @@ use std::f64;
 
 use bitstring::Bit;
 use bitstring::Bitstring;
+use predictor::predictor::Predictor;
 
 // Open questions:
 // - How to declare some fields final (apparently rejected by rust community).
 // - How to declare some fields mutable (can be changed for non-mut self).
 // - Have the tree implement iter and simplify some methods with "fold".
-
-/// An object capable of predicting observations and rewards based on
-/// experience. Predictors have an abstract notion of history which
-/// grows over time and represents the experience.
-pub trait Predictor {
-  /// Returns the size of the currently tracked history.
-  fn history_size(&self) -> usize;
-
-  /// Appends the provided bit string to the tracked history.
-  fn update(&mut self, bitstring: &Bitstring);
-
-  /// Reverts the context tree to a previous state by undoing update
-  /// operations. The specified size must be at most the current size.
-  fn revert_to_history_size(&mut self, target_size: usize);
-
-  /// Returns the probability, given the current history, that "bits" are the
-  /// next observed symbols.
-  fn predict(&mut self, bits: &Bitstring) -> f64;
-}
 
 /// Context tree which computes a probability estimate for a sequence of
 /// bits based on a mixture model of Markov chains. Lower-degree Markov
