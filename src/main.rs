@@ -24,8 +24,8 @@ extern crate ai;
 #[macro_use] extern crate log;
 
 use ai::agent::Agent;
-use ai::environment::Environment;
-use ai::environment::CoinFlip;
+use ai::environment::environment::Environment;
+use ai::environment::environment::CoinFlip;
 use ai::logger::StdoutLogger;
 use ai::random::RandomImpl;
 
