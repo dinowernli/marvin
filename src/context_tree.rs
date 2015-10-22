@@ -68,8 +68,8 @@ impl Predictor for ContextTree {
   }
 
   fn revert_to_history_size(&mut self, target_size: usize) {
-    assert!(target_size <= self.history_size());
-    while target_size > self.history_size() {
+    assert!(self.history_size() >= target_size);
+    while self.history_size() > target_size {
       self.revert_last();
     }
   }
