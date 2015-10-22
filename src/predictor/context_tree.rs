@@ -24,7 +24,7 @@ use std::f64;
 
 use bitstring::Bit;
 use bitstring::Bitstring;
-use predictor::predictor::Predictor;
+use predictor::Predictor;
 
 // Open questions:
 // - How to declare some fields final (apparently rejected by rust community).

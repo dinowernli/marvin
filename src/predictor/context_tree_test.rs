@@ -22,7 +22,7 @@
 
 use bitstring::Bitstring;
 use predictor::context_tree::ContextTree;
-use predictor::predictor::Predictor;
+use predictor::Predictor;
 
 const EPS: f64 = 0.0000001;
 

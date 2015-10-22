@@ -20,8 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
 pub mod context_tree;
-pub mod predictor;
+
+mod predictor;
+pub use predictor::predictor::Predictor;
 
 // Unit test modules.
 

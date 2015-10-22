@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 use predictor::context_tree::ContextTree;
-use predictor::predictor::Predictor;
+use predictor::Predictor;
 use random::Random;
 use types::{Action, Observation, Reward};
 
