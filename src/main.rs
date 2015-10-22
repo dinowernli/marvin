@@ -21,9 +21,7 @@
 // SOFTWARE.
 
 extern crate ai;
-
-#[macro_use]
-extern crate log;
+#[macro_use] extern crate log;
 
 use ai::agent::Agent;
 use ai::environment::Environment;
@@ -68,7 +66,7 @@ fn main() {
     info!("Cycle: {}, [{:?}, {:?}, {:?}]",
         cycle, action, observation, reward);
   }
-  
+
   // Report results.
   info!("The average reward after {} rounds is {:?}",
       agent.age(), agent.average_reward());

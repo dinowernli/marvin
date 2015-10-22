@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 extern crate rand;
-extern crate log;
+#[macro_use] extern crate log;
 
 pub mod agent;
 pub mod bitstring;
@@ -32,6 +32,7 @@ pub mod types;
 pub mod random;
 
 // Unit test modules.
+
 #[cfg(test)]
 pub mod agent_test;
 
