@@ -39,20 +39,33 @@ fn empty_size() {
 }
 
 #[test]
-fn empty_probability() {
+fn predict_empty() {
   let mut tree = ContextTree::create(0);
-  let block_prob = tree.log_block_prob().exp2();
-  assert_almost_eq(1.0, block_prob, EPS);
+  assert_almost_eq(1.0, tree.predict(&Bitstring::create_empty()), EPS);
 }
 
 #[test]
 fn predict_uniform() {
   let mut tree = ContextTree::create(3);
-  let prob = tree.predict(&Bitstring::create_from_u64(2));
+  let prob = tree.predict(&Bitstring::create_from_string("01"));
 
-  // The bitstring corresponds to "10", so length two. Since there is not
-  // enough history for depth 3, predict should be uniform.
+  // Bitstring of length 2, not enough history, so uniform distribution.
   assert_almost_eq(0.25, prob, EPS);
+}
+
+#[test]
+fn predict_with_history() {
+  let mut tree = ContextTree::create(3);
+  let bits = Bitstring::create_from_string("100");
+  let history = Bitstring::create_from_string("10011110");
+
+  // At first, uniform distribution for length 3.
+  assert_almost_eq(0.125, tree.predict(&bits), EPS);
+
+  tree.update(&history);
+
+  // Now, expect the value we got from a reference implementation.
+  assert_almost_eq(0.050951086956, tree.predict(&bits), EPS);
 }
 
 #[test]
@@ -67,6 +80,7 @@ fn invalid_revert() {
 
 fn assert_almost_eq(expected: f64, actual: f64, tol: f64) {
   let diff = expected - actual;
-  assert!(diff < tol, "diff = {}, but expected less than {}", diff, tol);
-  assert!(diff > -tol, "diff = {}, but expected at least {}", diff, tol);
+  let message = format!(
+      "expected {} but got {}, diff = {}", expected, actual, diff);
+  assert!(-tol < diff && diff < tol, message);
 }

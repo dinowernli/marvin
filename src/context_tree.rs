@@ -87,8 +87,20 @@ impl Predictor for ContextTree {
       return (neg_len as f64).exp2();
     }
 
-    // TODO(dinowernli): Implement the rest.
-    return 0.0;
+    // Add all the symbols and store the block probability before and after.
+    let initial_size = self.history_size();
+    let initial_log_prob = self.log_block_prob();
+
+    self.update(bits);
+    let final_log_prob = self.log_block_prob();
+    self.revert_to_history_size(initial_size);
+
+    // Let "b" be bits and "h" be our history. We use the equation:
+    //      P[hb] = P[h] * P[b | h]
+    // <==> log(P[hb]) = log(P[h]) + log(P[b | h])
+    // <==> log(P[b | h]) = log(P[hb]) - log(P[h])
+    let log_conditional_prob = final_log_prob - initial_log_prob;
+    return log_conditional_prob.exp2();
   }
 }
 
@@ -128,9 +140,7 @@ impl ContextTree {
   }
 
   /// Returns log2 of the estimated probability of the current history.
-  /// TODO(dinowernli): Make this private again once this functionality is
-  /// exposed via actual prediction.
-  pub fn log_block_prob(&mut self) -> f64 {
+  fn log_block_prob(&mut self) -> f64 {
     return self.root.log_weighted_prob();
   }
 
@@ -213,7 +223,7 @@ impl Node {
       history: &Bitstring,
       depth: usize) {
     if !self.is_leaf() {
-      let bit = history.bit(history.len() - depth);
+      let bit = history.bit(history.len() - depth - 1);
       self.mut_child(bit).execute(closure, history, depth + 1);
     }
     closure(self);
