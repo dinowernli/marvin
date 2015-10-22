@@ -21,8 +21,8 @@
 // SOFTWARE.
 
 use bitstring::Bitstring;
-use context_tree::ContextTree;
-use context_tree::Predictor;
+use predictor::context_tree::ContextTree;
+use predictor::context_tree::Predictor;
 
 const EPS: f64 = 0.0000001;
 

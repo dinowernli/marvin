@@ -22,7 +22,7 @@
 
 use agent::Agent;
 use bitstring::Bitstring;
-use context_tree::Predictor;
+use predictor::context_tree::Predictor;
 use random::Random;
 use types::{Observation, Reward};
 
