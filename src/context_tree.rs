@@ -26,8 +26,8 @@ use bitstring::Bit;
 use bitstring::Bitstring;
 
 // Open questions:
-// - How to declare some fields final
-// - How to declare some fields mutable (can be changed for non-mut self)
+// - How to declare some fields final (apparently rejected by rust community).
+// - How to declare some fields mutable (can be changed for non-mut self).
 // - Have the tree implement iter and simplify some methods with "fold".
 
 /// An object capable of predicting observations and rewards based on
