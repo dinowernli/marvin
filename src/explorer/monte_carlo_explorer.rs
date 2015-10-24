@@ -31,6 +31,7 @@ impl MonteCarloExplorer {
 
 impl Explorer for MonteCarloExplorer {
   fn explore(&mut self, num_actions: i16) -> Action {
+    #![allow(unused_variables)]
     // TODO(dinowernli): Return an actual reasonable action.
     return Action(0);
   }

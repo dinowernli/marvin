@@ -22,7 +22,7 @@
 
 use std::ops::{Add, Div};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Reward(pub f64);
 
 impl Add for Reward {

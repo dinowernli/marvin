@@ -64,14 +64,10 @@ impl Agent {
     }
   }
 
-  pub fn age(&self) -> i32 {
-    self.age
-  }
+  pub fn age(&self) -> i32 { self.age }
 
   /// Returns the total reward accumulated so far.
-  pub fn total_reward(&self) -> Reward {
-    self.total_reward
-  }
+  pub fn total_reward(&self) -> Reward { self.total_reward }
 
   /// Returns the average reward accumulated so far.
   pub fn average_reward(&self) -> Reward {
@@ -80,6 +76,8 @@ impl Agent {
 
   /// Returns an action in [0, num_actions - 1].
   pub fn act(&mut self) -> Action {
+    // TODO(dinowernli): Switch to the mc_explorer entirely once it is done.
+    #![allow(unused_variables)]
     let mc_explorer = self.explorer_factory.create_monte_carlo_explorer(
         &mut *self.predictor);
     let mut random_explorer = self.explorer_factory.create_random_explorer();
@@ -89,6 +87,8 @@ impl Agent {
   /// Update the agent's view of the world based on a new
   /// (observation, reward) pair.
   pub fn update(&mut self, observation: Observation, reward: Reward) {
+    // TODO(dinowernli): Inform the predictor of the new data.
+    #![allow(unused_variables)]
     self.age = self.age + 1;
     self.total_reward = self.total_reward + reward;
   }

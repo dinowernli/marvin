@@ -37,6 +37,17 @@ fn age() {
   assert_eq!(1, agent.age());
 }
 
+#[test]
+fn reward() {
+  let fake_predictor = Box::new(FakePredictor);
+  let fake_explorer_factory = Box::new(FakeExplorerFactory);
+  let mut agent = Agent::new(10, fake_predictor, fake_explorer_factory);
+
+  assert_eq!(Reward(0.0), agent.total_reward());
+  agent.update(Observation(3), Reward(4.0));
+  assert_eq!(Reward(4.0), agent.total_reward());
+}
+
 
 // Fake predictor.
 
