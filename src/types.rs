@@ -22,6 +22,7 @@
 
 use std::ops::{Add, Div};
 
+/// A generic representation of cumulative rewards.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Reward(pub f64);
 
@@ -44,8 +45,16 @@ impl Div<f64> for Reward {
   }
 }
 
-#[derive(Copy, Clone, Debug)]
+/// The representation of a single reward as directly returned by the
+/// environment.
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub struct SingleReward(pub i16);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Observation(pub i16);
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub struct Percept(pub Observation, pub SingleReward);
+
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Action(pub i16);

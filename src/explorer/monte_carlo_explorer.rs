@@ -22,7 +22,9 @@
 
 use explorer::Explorer;
 use predictor::Predictor;
-use types::Action;
+use types::{Action, Percept, Reward};
+
+use std::collections::HashMap;
 
 pub struct MonteCarloExplorer<'a> {
   predictor: &'a mut Predictor,
@@ -43,3 +45,47 @@ impl <'a> Explorer for MonteCarloExplorer<'a> {
     return Action(0);
   }
 }
+
+trait Node {
+  fn mean_reward(&self) -> Reward;
+}
+
+struct ActionNode <'a> {
+  visits: u64,
+  mean_reward: Reward,
+  children: Box<HashMap<Percept, Box<Node + 'a>>>,
+}
+
+impl <'a> ActionNode<'a> {
+  fn mut_child(&'a mut self, percept: Percept) -> &'a mut Node {
+    if !self.children.contains_key(&percept) {
+      self.children.insert(percept, Box::new(ChanceNode::new()));
+    }
+    return &mut **self.children.get_mut(&percept).unwrap();
+  }
+}
+
+impl <'a> Node for ActionNode<'a> {
+  fn mean_reward(&self) -> Reward { self.mean_reward }
+}
+
+struct ChanceNode <'a> {
+  visits: u64,
+  mean_reward: Reward,
+  children: HashMap<Action, Box<Node + 'a>>,
+}
+
+impl <'a> ChanceNode<'a> {
+  fn new() -> ChanceNode<'a> {
+    ChanceNode {
+      visits: 0,
+      mean_reward: Reward(0.0),
+      children: HashMap::new(),
+    }
+  }
+}
+
+impl <'a> Node for ChanceNode<'a> {
+  fn mean_reward(&self) -> Reward { self.mean_reward }
+}
+
