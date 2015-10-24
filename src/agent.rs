@@ -76,10 +76,11 @@ impl Agent {
 
   /// Returns an action in [0, num_actions - 1].
   pub fn act(&mut self) -> Action {
-    // TODO(dinowernli): Switch to the mc_explorer entirely once it is done.
-    #![allow(unused_variables)]
     let mut mc_explorer = self.explorer_factory.create_monte_carlo_explorer(
         &mut *self.predictor);
+    mc_explorer.explore(self.num_actions);
+    // TODO(dinowernli): Return this result. For now, use the random explorer.
+
     let mut random_explorer = self.explorer_factory.create_random_explorer();
     return random_explorer.explore(self.num_actions);
   }
