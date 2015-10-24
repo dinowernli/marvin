@@ -42,6 +42,10 @@ impl <'a> Explorer for MonteCarloExplorer<'a> {
   fn explore(&mut self, num_actions: i16) -> Action {
     #![allow(unused_variables)]
     // TODO(dinowernli): Use self.predictor to find the best action.
+
+    // Create the root of the tree, always an action node.
+    let mut tree = ActionNode::new();
+
     return Action(0);
   }
 }
@@ -63,6 +67,14 @@ struct ActionNode {
 }
 
 impl ActionNode {
+  fn new() -> ActionNode {
+    ActionNode {
+      visits: 0,
+      mean_reward: Reward(0.0),
+      children: Box::new(HashMap::new()),
+    }
+  }
+
   fn mut_child(&mut self, percept: Percept) -> &mut ChanceNode {
     if !self.children.contains_key(&percept) {
       self.children.insert(percept, Box::new(ChanceNode::new()));
