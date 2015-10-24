@@ -20,14 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-mod explorer;
-pub use explorer::explorer::Explorer;
+use explorer::Explorer;
+use explorer::random_explorer::RandomExplorer;
+use random::Random;
+use types::Action;
 
-mod explorer_factory;
-pub use explorer::explorer_factory::ExplorerFactory;
-pub use explorer::explorer_factory::ExplorerFactoryImpl;
+#[test]
+fn explore() {
+  let mut explorer = RandomExplorer::new(Box::new(FakeRandom));
+  let Action(value) = explorer.explore(23);
 
-mod monte_carlo_explorer;
-mod random_explorer;
+  // The explorer passes 23 as limit, and random below returns limit - 1.
+  assert_eq!(22, value);
+}
 
-#[cfg(test)] mod random_explorer_test;
+
+// Fake predictor.
+
+struct FakeRandom;
+
+impl Random for FakeRandom {
+  fn next_modulo(&mut self, limit: u64) -> u64 {
+    return limit - 1;
+  }
+}
+
