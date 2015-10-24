@@ -57,6 +57,10 @@ trait Node {
   /// Returns an estimate of the mean reward taken over all hypothetical
   /// futures which pass through this node.
   fn mean_reward(&self) -> Reward;
+
+  /// Samples one path through this node, looking at most horizon steps into
+  /// the future.
+  fn sample(&mut self, horizon: usize) -> Reward;
 }
 
 /// A node which represents a possible action.
@@ -75,6 +79,8 @@ impl ActionNode {
     }
   }
 
+  /// Returns a mutable reference to the specified child. Lazily creates the
+  /// child if it is not present.
   fn mut_child(&mut self, percept: Percept) -> &mut ChanceNode {
     if !self.children.contains_key(&percept) {
       self.children.insert(percept, Box::new(ChanceNode::new()));
@@ -85,6 +91,14 @@ impl ActionNode {
 
 impl Node for ActionNode {
   fn mean_reward(&self) -> Reward { self.mean_reward }
+
+  fn sample(&mut self, horizon: usize) -> Reward {
+    if horizon == 0 {
+      return Reward(0.0);  // Chose as the additive neutral element.
+    }
+    // TODO(dinowernli): Implement.
+    return self.sample(horizon - 1);
+  }
 }
 
 /// A node which represents a possible reaction of the environment.
@@ -102,9 +116,26 @@ impl ChanceNode {
       children: Box::new(HashMap::new()),
     }
   }
+
+  /// Returns a mutable reference to the specified child. Lazily creates the
+  /// child if it is not present.
+  fn mut_child(&mut self, action: Action) -> &mut ActionNode {
+    if !self.children.contains_key(&action) {
+      self.children.insert(action, Box::new(ActionNode::new()));
+    }
+    return &mut **self.children.get_mut(&action).unwrap();
+  }
 }
 
 impl Node for ChanceNode {
   fn mean_reward(&self) -> Reward { self.mean_reward }
+
+  fn sample(&mut self, horizon: usize) -> Reward {
+    if horizon == 0 {
+      return Reward(0.0);  // Chose as the additive neutral element.
+    }
+    // TODO(dinowernli): Implement.
+    return self.sample(horizon - 1);
+  }
 }
 
