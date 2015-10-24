@@ -46,18 +46,24 @@ impl <'a> Explorer for MonteCarloExplorer<'a> {
   }
 }
 
+/// Represents a node in the exploration search tree. Each node represents
+/// either an action or a percept and a path through the tree represents a
+/// sequence of events, i.e., a possible future.
 trait Node {
+  /// Returns an estimate of the mean reward taken over all hypothetical
+  /// futures which pass through this node.
   fn mean_reward(&self) -> Reward;
 }
 
-struct ActionNode <'a> {
+/// A node which represents a possible action.
+struct ActionNode {
   visits: u64,
   mean_reward: Reward,
-  children: Box<HashMap<Percept, Box<Node + 'a>>>,
+  children: Box<HashMap<Percept, Box<ChanceNode>>>,
 }
 
-impl <'a> ActionNode<'a> {
-  fn mut_child(&'a mut self, percept: Percept) -> &'a mut Node {
+impl ActionNode {
+  fn mut_child(&mut self, percept: Percept) -> &mut ChanceNode {
     if !self.children.contains_key(&percept) {
       self.children.insert(percept, Box::new(ChanceNode::new()));
     }
@@ -65,27 +71,28 @@ impl <'a> ActionNode<'a> {
   }
 }
 
-impl <'a> Node for ActionNode<'a> {
+impl Node for ActionNode {
   fn mean_reward(&self) -> Reward { self.mean_reward }
 }
 
-struct ChanceNode <'a> {
+/// A node which represents a possible reaction of the environment.
+struct ChanceNode {
   visits: u64,
   mean_reward: Reward,
-  children: HashMap<Action, Box<Node + 'a>>,
+  children: Box<HashMap<Action, Box<ActionNode>>>,
 }
 
-impl <'a> ChanceNode<'a> {
-  fn new() -> ChanceNode<'a> {
+impl ChanceNode {
+  fn new() -> ChanceNode {
     ChanceNode {
       visits: 0,
       mean_reward: Reward(0.0),
-      children: HashMap::new(),
+      children: Box::new(HashMap::new()),
     }
   }
 }
 
-impl <'a> Node for ChanceNode<'a> {
+impl Node for ChanceNode {
   fn mean_reward(&self) -> Reward { self.mean_reward }
 }
 
