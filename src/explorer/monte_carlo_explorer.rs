@@ -21,18 +21,25 @@
 // SOFTWARE.
 
 use explorer::Explorer;
+use predictor::Predictor;
 use types::Action;
 
-pub struct MonteCarloExplorer;
-
-impl MonteCarloExplorer {
-  pub fn new() -> MonteCarloExplorer { MonteCarloExplorer }
+pub struct MonteCarloExplorer<'a> {
+  predictor: &'a mut Predictor,
 }
 
-impl Explorer for MonteCarloExplorer {
+impl <'a> MonteCarloExplorer<'a> {
+  pub fn new(predictor: &mut Predictor) -> MonteCarloExplorer {
+    MonteCarloExplorer {
+      predictor: predictor,
+    }
+  }
+}
+
+impl <'a> Explorer for MonteCarloExplorer<'a> {
   fn explore(&mut self, num_actions: i16) -> Action {
     #![allow(unused_variables)]
-    // TODO(dinowernli): Return an actual reasonable action.
+    // TODO(dinowernli): Use self.predictor to find the best action.
     return Action(0);
   }
 }

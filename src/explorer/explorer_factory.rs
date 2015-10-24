@@ -28,8 +28,8 @@ use random::RandomImpl;
 
 /// An object which knows how to produce explorers.
 pub trait ExplorerFactory {
-  fn create_monte_carlo_explorer(
-      &self, predictor: &mut Predictor) -> Box<Explorer>;
+  fn create_monte_carlo_explorer<'a>(
+      &self, predictor: &'a mut Predictor) -> Box<Explorer + 'a>;
   fn create_random_explorer(
       &self) -> Box<Explorer>;
 }
@@ -41,9 +41,9 @@ impl ExplorerFactoryImpl {
 }
 
 impl ExplorerFactory for ExplorerFactoryImpl {
-  fn create_monte_carlo_explorer(
-      &self, predictor: &mut Predictor) -> Box<Explorer> {
-    Box::new(MonteCarloExplorer::new())
+  fn create_monte_carlo_explorer<'a>(
+      &self, predictor: &'a mut Predictor) -> Box<Explorer + 'a> {
+    Box::new(MonteCarloExplorer::new(predictor))
   }
 
   fn create_random_explorer(&self) -> Box<Explorer> {
