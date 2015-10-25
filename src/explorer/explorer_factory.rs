@@ -43,7 +43,9 @@ impl ExplorerFactoryImpl {
 impl ExplorerFactory for ExplorerFactoryImpl {
   fn create_monte_carlo_explorer<'a>(
       &self, predictor: &'a mut Predictor) -> Box<Explorer + 'a> {
-    Box::new(MonteCarloExplorer::new(predictor))
+    Box::new(MonteCarloExplorer::new(
+        predictor,
+        Box::new(RandomImpl::create(586745))))
   }
 
   fn create_random_explorer(&self) -> Box<Explorer> {

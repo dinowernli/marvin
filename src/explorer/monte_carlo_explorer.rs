@@ -22,18 +22,22 @@
 
 use explorer::Explorer;
 use predictor::Predictor;
+use random::Random;
 use types::{Action, Percept, Reward};
 
 use std::collections::HashMap;
 
 pub struct MonteCarloExplorer<'a> {
   predictor: &'a mut Predictor,
+  random: Box<Random>,
 }
 
 impl <'a> MonteCarloExplorer<'a> {
-  pub fn new(predictor: &mut Predictor) -> MonteCarloExplorer {
+  pub fn new(predictor: &'a mut Predictor, random: Box<Random>)
+      -> MonteCarloExplorer<'a> {
     MonteCarloExplorer {
       predictor: predictor,
+      random: random,
     }
   }
 }
