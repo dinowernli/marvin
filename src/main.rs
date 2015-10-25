@@ -47,7 +47,7 @@ fn main() {
   // Setup the agent and the environment.
   let mut environment = CoinFlip::new(&mut rand);
   let mut agent = Agent::create_aixi(
-      environment.num_actions(),
+      environment.info(),
       CONTEXT_TREE_DEPTH);
 
   // Let the agent interact with the environment.

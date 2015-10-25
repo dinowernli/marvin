@@ -20,17 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use agent::EnvironmentInfo;
 use random::Random;
-use types::{Action, Observation, Reward};
+use types::{Action, Observation, Reward, SingleReward};
 
 /// Models a general environment an agent can interact with and
-/// learn from. Know how many actions are availavle and knows
-/// how to process the actions of agent.
+/// learn from.
 pub trait Environment {
-  fn num_actions(&self) -> i16;
-  fn reward(&self) -> Reward;
+  /// Returns basic information about the environment.
+  fn info(&self) -> EnvironmentInfo;
+
+  /// Returns the latest reward. Only call this after the first call to update.
+  fn reward(&self) -> SingleReward;
+
+  /// Returns the latest observation. Only call this after the first call to
+  /// update.
   fn observation(&self) -> Observation;
 
+  /// Recomputes the values of observation and reward based on a taken action.
+  /// The supplied action must be within the range advertised in info() or else
+  /// the behavior is unspecified.
   fn update(&mut self, action: Action);
 }
 
@@ -61,15 +70,22 @@ impl <'a> CoinFlip<'a> {
 }
 
 impl <'a> Environment for CoinFlip<'a> {
-  fn num_actions(&self) -> i16 {
-    return 2;
+  fn info(&self) -> EnvironmentInfo {
+    EnvironmentInfo::new(
+        2 /* num_actions */,
+        SingleReward(0) /* min_reward */,
+        SingleReward(1) /* max_reward */,
+    )
   }
 
-  fn reward(&self) -> Reward {
-    Reward(match self.last_guess {
-      Some(val) => if val == self.last_toss { 11.0 } else { 10.0 },
-      _ => 0.0,
-    })
+  fn reward(&self) -> SingleReward {
+    // It is invalid to ask for a reward before the first update(), so we
+    // unwrap the last guess.
+    let is_correct = self.last_guess.unwrap() == self.last_toss;
+    return SingleReward(match is_correct {
+      true => 1,
+      false => 0,
+    });
   }
 
   fn observation(&self) -> Observation {
@@ -80,13 +96,13 @@ impl <'a> Environment for CoinFlip<'a> {
   }
 
   fn update(&mut self, action: Action) {
-    let Action(a) = action;
-    debug_assert!(a >= 0 && a < self.num_actions());
+    let num_actions = self.info().num_actions();
 
     self.last_guess = match action {
       Action(0) => Some(CoinToss::Heads),
       Action(1) => Some(CoinToss::Tails),
-      _ => None,
+      Action(n) =>
+          panic!("Got {:?} but num_actions is {}", action, num_actions),
     };
 
     self.last_toss = match self.random.next_modulo(2) {

@@ -20,34 +20,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use agent::Agent;
+use agent::{Agent, EnvironmentInfo};
 use bitstring::Bitstring;
 use explorer::{Explorer, ExplorerFactory};
 use predictor::Predictor;
-use types::{Action, Observation, Reward};
+use types::{Action, Observation, Reward, SingleReward};
 
 #[test]
 fn age() {
-  let fake_predictor = Box::new(FakePredictor);
-  let fake_explorer_factory = Box::new(FakeExplorerFactory);
-  let mut agent = Agent::new(10, fake_predictor, fake_explorer_factory);
+  let mut agent = Agent::new(
+      default_info(),
+      Box::new(FakePredictor),
+      Box::new(FakeExplorerFactory)
+  );
 
   assert_eq!(0, agent.age());
-  agent.update(Observation(3), Reward(4.0));
+  agent.update(Observation(3), SingleReward(4));
   assert_eq!(1, agent.age());
 }
 
 #[test]
 fn reward() {
-  let fake_predictor = Box::new(FakePredictor);
-  let fake_explorer_factory = Box::new(FakeExplorerFactory);
-  let mut agent = Agent::new(10, fake_predictor, fake_explorer_factory);
+  let mut agent = Agent::new(
+      default_info(),
+      Box::new(FakePredictor),
+      Box::new(FakeExplorerFactory)
+  );
 
   assert_eq!(Reward(0.0), agent.total_reward());
-  agent.update(Observation(3), Reward(4.0));
+  agent.update(Observation(3), SingleReward(4));
   assert_eq!(Reward(4.0), agent.total_reward());
 }
 
+fn default_info() -> EnvironmentInfo {
+  EnvironmentInfo::new(
+      10 /* num_actions */,
+      SingleReward(-3) /* min_reward */,
+      SingleReward(7) /* max_reward */,
+  )
+}
 
 // Fake predictor.
 
