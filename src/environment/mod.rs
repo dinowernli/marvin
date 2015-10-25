@@ -20,5 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pub mod environment;
+mod environment;
+pub use environment::environment::Environment;
 
+pub mod coin_flip;
