@@ -27,6 +27,7 @@ use types::{Action, Observation, Reward, SingleReward};
 
 /// Contains basic information about the environment and represents all
 /// a-priori knowledge of the agent about the environment.
+#[derive(Copy, Clone)]
 pub struct EnvironmentInfo {
   num_actions: i16,
   min_reward: SingleReward,
@@ -102,16 +103,13 @@ impl Agent {
   /// Returns an action which is valid with respect to the environment, i.e.,
   /// an action within [0, environment_info.num_actions - 1].
   pub fn act(&mut self) -> Action {
-    // TODO(dinowernil): Pass the entire info to the explorer.
-    let num_actions = self.environment_info.num_actions;
-
     let mut mc_explorer = self.explorer_factory.create_monte_carlo_explorer(
         &mut *self.predictor);
-    mc_explorer.explore(num_actions);
+    mc_explorer.explore(self.environment_info);
     // TODO(dinowernli): Return this result. For now, use the random explorer.
 
     let mut random_explorer = self.explorer_factory.create_random_explorer();
-    return random_explorer.explore(num_actions);
+    return random_explorer.explore(self.environment_info);
   }
 
   /// Update the agent's view of the world based on a new

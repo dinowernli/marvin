@@ -20,11 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use agent::EnvironmentInfo;
 use types::Action;
 
 /// An object which knows how to explore the space of possible actions and pick
 /// the most appropriate one.
 pub trait Explorer {
   /// Returns an action within [0, num_actions - 1].
-  fn explore(&mut self, num_actions: i16) -> Action;
+  fn explore(&mut self, environment_info: EnvironmentInfo) -> Action;
 }

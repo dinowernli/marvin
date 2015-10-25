@@ -103,7 +103,7 @@ impl ExplorerFactory for FakeExplorerFactory {
 struct FakeExplorer;
 
 impl Explorer for FakeExplorer {
-  fn explore(&mut self, num_actions: i16) -> Action {
+  fn explore(&mut self, environment_info: EnvironmentInfo) -> Action {
     #![allow(unused_variables)]
     Action(0)
   }

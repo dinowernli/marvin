@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use agent::EnvironmentInfo;
 use explorer::Explorer;
 use random::Random;
 use types::Action;
@@ -37,7 +38,8 @@ impl RandomExplorer {
 }
 
 impl Explorer for RandomExplorer {
-  fn explore(&mut self, num_actions: i16) -> Action {
+  fn explore(&mut self, environment_info: EnvironmentInfo) -> Action {
+    let num_actions = environment_info.num_actions();
     Action(self.random.next_modulo(num_actions as u64) as i16)
   }
 }

@@ -20,20 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use agent::EnvironmentInfo;
 use explorer::Explorer;
 use explorer::random_explorer::RandomExplorer;
 use random::Random;
-use types::Action;
+use types::{Action, SingleReward};
 
 #[test]
 fn explore() {
   let mut explorer = RandomExplorer::new(Box::new(FakeRandom));
-  let Action(value) = explorer.explore(23);
+  let Action(value) = explorer.explore(default_info());
 
   // The explorer passes 23 as limit, and random below returns limit - 1.
   assert_eq!(22, value);
 }
 
+fn default_info() -> EnvironmentInfo {
+  EnvironmentInfo::new(
+      23 /* num_actions */,
+      SingleReward(-3) /* min_reward */,
+      SingleReward(7) /* max_reward */,
+  )
+}
 
 // Fake predictor.
 

@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use agent::EnvironmentInfo;
 use explorer::Explorer;
 use predictor::Predictor;
 use random::Random;
@@ -43,12 +44,12 @@ impl <'a> MonteCarloExplorer<'a> {
 }
 
 impl <'a> Explorer for MonteCarloExplorer<'a> {
-  fn explore(&mut self, num_actions: i16) -> Action {
+  fn explore(&mut self, environment_info: EnvironmentInfo) -> Action {
     #![allow(unused_variables)]
     // TODO(dinowernli): Use self.predictor to find the best action.
 
     // Create the root of the tree, always an action node.
-    let mut tree = ActionNode::new(num_actions);
+    let mut tree = ActionNode::new(environment_info);
 
     return Action(0);
   }
@@ -70,16 +71,16 @@ trait Node {
 /// A node which represents a possible action.
 struct ActionNode {
   visits: u64,
-  num_actions: i16,
+  environment_info: EnvironmentInfo,
   mean_reward: Reward,
   children: Box<HashMap<Percept, Box<ChanceNode>>>,
 }
 
 impl ActionNode {
-  fn new(num_actions: i16) -> ActionNode {
+  fn new(environment_info: EnvironmentInfo) -> ActionNode {
     ActionNode {
       visits: 0,
-      num_actions: num_actions,
+      environment_info: environment_info,
       mean_reward: Reward(0.0),
       children: Box::new(HashMap::new()),
     }
@@ -89,8 +90,8 @@ impl ActionNode {
   /// child if it is not present.
   fn mut_child(&mut self, percept: Percept) -> &mut ChanceNode {
     if !self.children.contains_key(&percept) {
-      let num_actions = self.num_actions;
-      self.children.insert(percept, Box::new(ChanceNode::new(num_actions)));
+      let info = self.environment_info;
+      self.children.insert(percept, Box::new(ChanceNode::new(info)));
     }
     return &mut **self.children.get_mut(&percept).unwrap();
   }
@@ -121,16 +122,16 @@ impl Node for ActionNode {
 /// A node which represents a possible reaction of the environment.
 struct ChanceNode {
   visits: u64,
-  num_actions: i16,
+  environment_info: EnvironmentInfo,
   mean_reward: Reward,
   children: Box<HashMap<Action, Box<ActionNode>>>,
 }
 
 impl ChanceNode {
-  fn new(num_actions: i16) -> ChanceNode {
+  fn new(environment_info: EnvironmentInfo) -> ChanceNode {
     ChanceNode {
       visits: 0,
-      num_actions: num_actions,
+      environment_info: environment_info,
       mean_reward: Reward(0.0),
       children: Box::new(HashMap::new()),
     }
@@ -140,8 +141,8 @@ impl ChanceNode {
   /// child if it is not present.
   fn mut_child(&mut self, action: Action) -> &mut ActionNode {
     if !self.children.contains_key(&action) {
-      let num_actions = self.num_actions;
-      self.children.insert(action, Box::new(ActionNode::new(num_actions)));
+      let info = self.environment_info;
+      self.children.insert(action, Box::new(ActionNode::new(info)));
     }
     return &mut **self.children.get_mut(&action).unwrap();
   }
