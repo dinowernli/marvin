@@ -196,8 +196,10 @@ impl ActionNode {
     }
   }
 
-  /// Returns an action from the set, uniformly at random.
-  fn pick_random(&self, set: &BTreeSet<Action>, random: &mut Random) -> Action {
+  /// Returns an action from the set, uniformly at random. Linear in the size
+  /// of the supplied set.
+  fn pick_random(
+      &self, set: &BTreeSet<Action>, random: &mut Random) -> Action {
     let index = random.next_modulo(set.len() as u64);
     return *set.iter().nth(index as usize).unwrap();
   }
