@@ -36,6 +36,16 @@ impl Add for Reward {
   }
 }
 
+impl Add<SingleReward> for Reward {
+  type Output = Reward;
+
+  fn add(self, rhs: SingleReward) -> Reward {
+    let Reward(value) = self;
+    let SingleReward(rhvalue) = rhs;
+    return Reward(value + rhvalue as f64);
+  }
+}
+
 impl Div<f64> for Reward {
   type Output = Reward;
 
