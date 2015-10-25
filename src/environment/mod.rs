@@ -24,3 +24,5 @@ mod environment;
 pub use environment::environment::Environment;
 
 pub mod coin_flip;
+
+#[cfg(test)] mod coin_flip_test;

@@ -21,33 +21,47 @@
 // SOFTWARE.
 
 use agent::EnvironmentInfo;
-use explorer::Explorer;
-use explorer::random_explorer::RandomExplorer;
+use environment::coin_flip::CoinFlip;
+use environment::environment::Environment;
 use random::Random;
-use types::{Action, SingleReward};
+use types::{Action, Observation, SingleReward};
 
 #[test]
-fn explore() {
-  let mut explorer = RandomExplorer::new(Box::new(FakeRandom));
-  let Action(value) = explorer.explore(default_info());
-
-  // The explorer passes 23 as limit, and random below returns limit - 1.
-  assert_eq!(22, value);
+fn info() {
+  let mut random = FakeRandom;
+  let mut coin_flip = CoinFlip::new(&mut random);
+  let info = coin_flip.info();
+  assert_eq!(2, info.num_actions());
+  assert_eq!(SingleReward(0), info.min_reward());
+  assert_eq!(SingleReward(1), info.max_reward());
 }
 
-fn default_info() -> EnvironmentInfo {
-  EnvironmentInfo::new(
-      23 /* num_actions */,
-      SingleReward(-3) /* min_reward */,
-      SingleReward(7) /* max_reward */,
-  )
+#[test]
+fn correct_guess() {
+  let mut random = FakeRandom;
+  let mut coin_flip = CoinFlip::new(&mut random);
+
+  coin_flip.update(Action(0));  // Correct guess.
+  assert_eq!(SingleReward(1), coin_flip.reward());
+  assert_eq!(Observation(0), coin_flip.observation());
+}
+
+#[test]
+#[should_panic]
+fn panics_if_no_update() {
+  let mut random = FakeRandom;
+  let mut coin_flip = CoinFlip::new(&mut random);
+  coin_flip.reward();
 }
 
 struct FakeRandom;
 
 impl Random for FakeRandom {
   fn next_modulo(&mut self, limit: u64) -> u64 {
-    return limit - 1;
+    if limit != 2 {
+      panic!("Coin flip should only use modulo 2, but got {}", limit);
+    }
+    return 0;  // Heads.
   }
 }
 

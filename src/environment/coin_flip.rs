@@ -23,7 +23,7 @@
 use agent::EnvironmentInfo;
 use environment::Environment;
 use random::Random;
-use types::{Action, Observation, Reward, SingleReward};
+use types::{Action, Observation, SingleReward};
 
 /// An environment in which the observations represent repeated
 /// tosses of a coin. Actions which guess the outcome of the coin
@@ -83,8 +83,7 @@ impl <'a> Environment for CoinFlip<'a> {
     self.last_guess = match action {
       Action(0) => Some(CoinToss::Heads),
       Action(1) => Some(CoinToss::Tails),
-      Action(n) =>
-          panic!("Got {:?} but num_actions is {}", action, num_actions),
+      _ => panic!("Got {:?} but num_actions is {}", action, num_actions),
     };
 
     self.last_toss = match self.random.next_modulo(2) {
