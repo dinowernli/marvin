@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use std::ops::{Add, Div};
+use std::ops::{Add, Div, Sub};
 
 /// A generic representation of cumulative rewards.
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -60,11 +60,22 @@ impl Div<f64> for Reward {
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct SingleReward(pub i16);
 
+impl Sub for SingleReward {
+  type Output = SingleReward;
+
+  fn sub(self, rhs: SingleReward) -> SingleReward {
+    let SingleReward(value) = self;
+    let SingleReward(rhvalue) = rhs;
+    return SingleReward(value - rhvalue);
+  }
+}
+
+
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Observation(pub i16);
 
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct Percept(pub Observation, pub SingleReward);
 
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Action(pub i16);

@@ -49,6 +49,10 @@ impl EnvironmentInfo {
   pub fn num_actions(&self) -> i16 { self.num_actions }
   pub fn min_reward(&self) -> SingleReward { self.min_reward }
   pub fn max_reward(&self) -> SingleReward { self.max_reward }
+
+  pub fn reward_range(&self) -> SingleReward {
+    self.max_reward - self.min_reward
+  }
 }
 
 /// Model struct for an agent which can interact with an environment.

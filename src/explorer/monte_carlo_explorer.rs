@@ -24,13 +24,17 @@ use agent::EnvironmentInfo;
 use explorer::Explorer;
 use predictor::Predictor;
 use random::Random;
-use types::{Action, Percept, Reward};
+use types::{Action, Percept, Reward, SingleReward};
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, BTreeSet};
 
 /// The number of visits we require to child action nodes before starting to
 /// trade off explore and exploit.
 const MIN_VISITS: usize = 1;
+
+/// Corresponds to the "C" in the UCB description. Increasing this value result
+/// in more weight being put on explore vs. exploit. Should always be positive.
+const EXPLORE_RATIO: f64 = 0.2;
 
 pub struct MonteCarloExplorer<'a> {
   predictor: &'a mut Predictor,
@@ -54,6 +58,11 @@ impl <'a> Explorer for MonteCarloExplorer<'a> {
 
     // Create the root of the tree, always an action node.
     let mut tree = ActionNode::new(environment_info);
+
+    // TODO(dinowernli): The calls below prevent a few unused-warnings. Remove
+    // them once this method is fully implemented.
+    let action = tree.select_explore_exploit(&mut *self.random, 14);
+    self.predictor.history_size();
 
     return Action(0);
   }
@@ -143,25 +152,79 @@ impl ActionNode {
   /// Implements the UCB heuristic to trade off exploring unknown actions
   /// versus exploiting actions assumed to have a high payoff. Returns an
   /// action to explore next.
-  fn select_explore_exploit(&mut self, remaining_horizon: usize)
-      -> Action {
-    let mut require_visit: HashSet<Action> = HashSet::new();
+  fn select_explore_exploit(
+      &mut self,
+      random: &mut Random,
+      remaining_horizon: usize) -> Action {
+    // Stores the children, if any, which *need* to be visited.
+    let mut require_visit: BTreeSet<Action> = BTreeSet::new();
 
-    // Go through all possible actions and check the stat of the child nodes.
+    // Stores the children,if any with the highest UCB score.
+    let mut max_ucb_children: BTreeSet<Action> = BTreeSet::new();
+    let mut max_ucb_score: Option<f64> = None;
+
+    // Go through all actions and check the status of the corresponding child.
     for a in 0..self.environment_info.num_actions() - 1 {
       let action = Action(a);
-      let child = self.mut_child(Action(a));
+      self.mut_child(action);  // Makes sure we have a child node for 'action'.
+      let child = self.child(action);
+
       if child.requires_visit() {
         require_visit.insert(action);
+        continue;
       }
 
-      // TODO(dinowernli): Compute the UCB coefficient.
+      // We prioritize nodes which require visits, so if we have any, we can
+      // save ourselves the trouble of computing and UCB scores.
+      if require_visit.is_empty() {
+        let ucb = self.ucb_score(action, remaining_horizon);
+
+        if max_ucb_score.is_none() || ucb > max_ucb_score.unwrap() {
+          max_ucb_children.clear();
+          max_ucb_score = Some(ucb);
+        }
+
+        if max_ucb_score.is_some() && ucb == max_ucb_score.unwrap() {
+          // Note that this also triggers if ucb is the new max.
+          max_ucb_children.insert(action);
+        }
+      }
     }
 
-    // If any children require visits, pick one uniformly at random.
-    // TODO(dinowernli): Implement.
+    // Prioritize children requiring visits, and take the max UCB otherwise.
+    if !require_visit.is_empty() {
+      return self.pick_random(&require_visit, random);
+    } else {
+      debug_assert!(!max_ucb_children.is_empty());
+      return self.pick_random(&max_ucb_children, random);
+    }
+  }
 
-    Action(0)
+  fn pick_random(&self, set: &BTreeSet<Action>, random: &mut Random) -> Action {
+    let index = random.next_modulo(set.len() as u64);
+    return *set.iter().nth(index as usize).unwrap();
+  }
+
+  /// Computes the score of this action as given by the UCB heuristic. Assumes
+  /// that the child node for this action exists and has been visited at least
+  /// once.
+  fn ucb_score(&self, action: Action, remaining_horizon: usize) -> f64 {
+    let child = self.child(action);
+
+    let SingleReward(reward_range) = self.environment_info.reward_range();
+    let reward_scale = reward_range as f64 * remaining_horizon as f64;
+    let Reward(exploitation) = child.mean_reward() / reward_scale;
+    debug_assert!(exploitation >= 0.0);
+    debug_assert!(exploitation <= 1.0);
+
+    let visits = self.visits() as f64;
+    let visit_ratio = visits.log2() / child.visits() as f64;
+    let exploration = EXPLORE_RATIO * visit_ratio.sqrt();
+
+    let ucb = exploration + exploitation;
+    debug_assert!(ucb >= 0.0);
+
+    return ucb;
   }
 
   /// Returns a mutable reference to the specified child. Lazily creates the
@@ -172,6 +235,12 @@ impl ActionNode {
       self.children.insert(action, Box::new(ChanceNode::new(info)));
     }
     return &mut **self.children.get_mut(&action).unwrap();
+  }
+
+  /// Returns a reference to the child for this action. Only safe to call if
+  /// the child exists.
+  fn child(&self, action: Action) -> &ChanceNode {
+    return &**self.children.get(&action).unwrap();
   }
 }
 

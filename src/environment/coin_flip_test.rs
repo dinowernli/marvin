@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use agent::EnvironmentInfo;
 use environment::coin_flip::CoinFlip;
 use environment::environment::Environment;
 use random::Random;
@@ -50,7 +49,7 @@ fn correct_guess() {
 #[should_panic]
 fn panics_if_no_update() {
   let mut random = FakeRandom;
-  let mut coin_flip = CoinFlip::new(&mut random);
+  let coin_flip = CoinFlip::new(&mut random);
   coin_flip.reward();
 }
 
