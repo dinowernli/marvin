@@ -102,6 +102,7 @@ impl ActionNode {
       -> Action {
     // TODO(dinowernli): Plumb more environment information into here in order
     // to evalutae UCB (reward range, etc).
+    Action(0)
   }
 }
 
