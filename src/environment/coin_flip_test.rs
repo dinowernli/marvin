@@ -28,7 +28,7 @@ use types::{Action, Observation, SingleReward};
 #[test]
 fn info() {
   let mut random = FakeRandom;
-  let mut coin_flip = CoinFlip::new(&mut random);
+  let coin_flip = CoinFlip::new(&mut random);
   let info = coin_flip.info();
   assert_eq!(2, info.num_actions());
   assert_eq!(SingleReward(0), info.min_reward());
