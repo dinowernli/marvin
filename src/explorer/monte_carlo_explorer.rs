@@ -26,7 +26,11 @@ use predictor::Predictor;
 use random::Random;
 use types::{Action, Percept, Reward};
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+
+/// The number of visits we require to child action nodes before starting to
+/// trade off explore and exploit.
+const MIN_VISITS: usize = 1;
 
 pub struct MonteCarloExplorer<'a> {
   predictor: &'a mut Predictor,
@@ -66,65 +70,22 @@ trait Node {
   /// Samples one path through this node, looking at most horizon steps into
   /// the future.
   fn sample(&mut self, horizon: usize) -> Reward;
+
+  /// Returns the number of times this node has been visited.
+  fn visits(&self) -> usize;
+
+  /// Returns whether or not this node requires a visit, i.e., has been visted
+  /// less than the number of times considered minimal. Once a node no longer
+  /// requires visits, then we start trading off explore vs. exploit.
+  fn requires_visit(&self) -> bool { self.visits() < MIN_VISITS }
 }
 
-/// A node which represents a possible action.
-struct ActionNode {
-  visits: u64,
-  environment_info: EnvironmentInfo,
-  mean_reward: Reward,
-  children: Box<HashMap<Percept, Box<ChanceNode>>>,
-}
-
-impl ActionNode {
-  fn new(environment_info: EnvironmentInfo) -> ActionNode {
-    ActionNode {
-      visits: 0,
-      environment_info: environment_info,
-      mean_reward: Reward(0.0),
-      children: Box::new(HashMap::new()),
-    }
-  }
-
-  /// Returns a mutable reference to the specified child. Lazily creates the
-  /// child if it is not present.
-  fn mut_child(&mut self, percept: Percept) -> &mut ChanceNode {
-    if !self.children.contains_key(&percept) {
-      let info = self.environment_info;
-      self.children.insert(percept, Box::new(ChanceNode::new(info)));
-    }
-    return &mut **self.children.get_mut(&percept).unwrap();
-  }
-
-  /// Implements the UCB heuristic to trade off exploring unknown actions
-  /// versus exploiting actions assumed to have a high payoff. Returns an
-  /// action to explore next.
-  fn select_explore_exploit(&self, remaining_horizon: usize)
-      -> Action {
-    // TODO(dinowernli): Plumb more environment information into here in order
-    // to evalutae UCB (reward range, etc).
-    Action(0)
-  }
-}
-
-impl Node for ActionNode {
-  fn mean_reward(&self) -> Reward { self.mean_reward }
-
-  fn sample(&mut self, horizon: usize) -> Reward {
-    if horizon == 0 {
-      return Reward(0.0);  // Chose as the additive neutral element.
-    }
-    // TODO(dinowernli): Implement.
-    return self.sample(horizon - 1);
-  }
-}
-
-/// A node which represents a possible reaction of the environment.
+/// A node where the environment reacts.
 struct ChanceNode {
-  visits: u64,
+  visits: usize,
   environment_info: EnvironmentInfo,
   mean_reward: Reward,
-  children: Box<HashMap<Action, Box<ActionNode>>>,
+  children: Box<HashMap<Percept, Box<ActionNode>>>,
 }
 
 impl ChanceNode {
@@ -139,17 +100,84 @@ impl ChanceNode {
 
   /// Returns a mutable reference to the specified child. Lazily creates the
   /// child if it is not present.
-  fn mut_child(&mut self, action: Action) -> &mut ActionNode {
-    if !self.children.contains_key(&action) {
+  fn mut_child(&mut self, percept: Percept) -> &mut ActionNode {
+    if !self.children.contains_key(&percept) {
       let info = self.environment_info;
-      self.children.insert(action, Box::new(ActionNode::new(info)));
+      self.children.insert(percept, Box::new(ActionNode::new(info)));
     }
-    return &mut **self.children.get_mut(&action).unwrap();
+    return &mut **self.children.get_mut(&percept).unwrap();
   }
 }
 
 impl Node for ChanceNode {
   fn mean_reward(&self) -> Reward { self.mean_reward }
+  fn visits(&self) -> usize { self.visits }
+
+  fn sample(&mut self, horizon: usize) -> Reward {
+    if horizon == 0 {
+      return Reward(0.0);  // Chose as the additive neutral element.
+    }
+    // TODO(dinowernli): Implement.
+    return self.sample(horizon - 1);
+  }
+}
+
+/// A node where an action needs to be taken.
+struct ActionNode {
+  visits: usize,
+  environment_info: EnvironmentInfo,
+  mean_reward: Reward,
+  children: Box<HashMap<Action, Box<ChanceNode>>>,
+}
+
+impl ActionNode {
+  fn new(environment_info: EnvironmentInfo) -> ActionNode {
+    ActionNode {
+      visits: 0,
+      environment_info: environment_info,
+      mean_reward: Reward(0.0),
+      children: Box::new(HashMap::new()),
+    }
+  }
+
+  /// Implements the UCB heuristic to trade off exploring unknown actions
+  /// versus exploiting actions assumed to have a high payoff. Returns an
+  /// action to explore next.
+  fn select_explore_exploit(&mut self, remaining_horizon: usize)
+      -> Action {
+    let mut require_visit: HashSet<Action> = HashSet::new();
+
+    // Go through all possible actions and check the stat of the child nodes.
+    for a in 0..self.environment_info.num_actions() - 1 {
+      let action = Action(a);
+      let child = self.mut_child(Action(a));
+      if child.requires_visit() {
+        require_visit.insert(action);
+      }
+
+      // TODO(dinowernli): Compute the UCB coefficient.
+    }
+
+    // If any children require visits, pick one uniformly at random.
+    // TODO(dinowernli): Implement.
+
+    Action(0)
+  }
+
+  /// Returns a mutable reference to the specified child. Lazily creates the
+  /// child if it is not present.
+  fn mut_child(&mut self, action: Action) -> &mut ChanceNode {
+    if !self.children.contains_key(&action) {
+      let info = self.environment_info;
+      self.children.insert(action, Box::new(ChanceNode::new(info)));
+    }
+    return &mut **self.children.get_mut(&action).unwrap();
+  }
+}
+
+impl Node for ActionNode {
+  fn mean_reward(&self) -> Reward { self.mean_reward }
+  fn visits(&self) -> usize { self.visits }
 
   fn sample(&mut self, horizon: usize) -> Reward {
     if horizon == 0 {
